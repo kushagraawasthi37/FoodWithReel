@@ -16,10 +16,19 @@ export default function OwnerVideoPage() {
 
   useEffect(() => {
     const fetchOwnerVideos = async () => {
+      const token = localStorage.getItem("token"); // Bearer token
+      if (!token) {
+        setLoading(false);
+        console.error("User not authenticated");
+        return;
+      }
+
       try {
         const res = await axios.get(
           `${BACKEND_URL}/api/food/owner-food/${ownerId}`,
-          { withCredentials: true }
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
         setVideos(res.data.foodItems || []);
       } catch (err) {
@@ -28,6 +37,7 @@ export default function OwnerVideoPage() {
         setLoading(false);
       }
     };
+
     fetchOwnerVideos();
   }, [ownerId]);
 

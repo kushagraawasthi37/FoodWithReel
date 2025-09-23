@@ -5,7 +5,6 @@ import { FiMoreVertical } from "react-icons/fi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/comment.css";
 
-// <-- Replace with your deployed backend URL -->
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function CommentsPage() {
@@ -23,18 +22,23 @@ export default function CommentsPage() {
     fetchComments();
   }, []);
 
-  const fetchUser = () => {
-    axios
-      .get(`${BACKEND_URL}/api/auth/me`, { withCredentials: true })
-      .then((res) => setUser(res.data.user))
-      .catch(() => setUser(null));
+  const fetchUser = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return setUser(null);
+
+    try {
+      const res = await axios.get(`${BACKEND_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(res.data.user);
+    } catch {
+      setUser(null);
+    }
   };
 
   const fetchComments = async () => {
     try {
-      const res = await axios.get(
-        `${BACKEND_URL}/api/food/${foodId}/comments`
-      );
+      const res = await axios.get(`${BACKEND_URL}/api/food/${foodId}/comments`);
       setComments(res.data.comments);
     } catch (err) {
       console.error("Failed to fetch comments", err);
@@ -44,10 +48,14 @@ export default function CommentsPage() {
   const postComment = async () => {
     if (!user) return alert("Login to post comment");
     if (!newComment.trim()) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Login to post comment");
+
     await axios.post(
       `${BACKEND_URL}/api/food/comment`,
       { foodId, content: newComment },
-      { withCredentials: true }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     setNewComment("");
     fetchComments();
@@ -66,10 +74,13 @@ export default function CommentsPage() {
 
   const saveEdit = async (id) => {
     if (!editingContent.trim()) return;
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Login to edit comment");
+
     await axios.put(
       `${BACKEND_URL}/api/food/comment/${id}`,
       { content: editingContent },
-      { withCredentials: true }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     setEditingId(null);
     setEditingContent("");
@@ -78,8 +89,11 @@ export default function CommentsPage() {
 
   const deleteComment = async (id) => {
     if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Login to delete comment");
+
     await axios.delete(`${BACKEND_URL}/api/food/comment/${id}`, {
-      withCredentials: true,
+      headers: { Authorization: `Bearer ${token}` },
     });
     fetchComments();
   };
@@ -99,14 +113,8 @@ export default function CommentsPage() {
   };
 
   const renderAvatar = (user) => {
-    if (user.avatar) {
-      return <img src={user.avatar} alt={user.fullName} className="avatar" />;
-    }
-    return (
-      <div className="avatar-placeholder">
-        {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
-      </div>
-    );
+    if (user.avatar) return <img src={user.avatar} alt={user.fullName} className="avatar" />;
+    return <div className="avatar-placeholder">{user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}</div>;
   };
 
   return (
@@ -135,19 +143,14 @@ export default function CommentsPage() {
               <div className="comment-user-info">
                 {renderAvatar(c.user)}
                 <div>
-                  <span className="user-fullname">
-                    {c.user.fullName || c.user.name || "Unknown User"}
-                  </span>
+                  <span className="user-fullname">{c.user.fullName || c.user.name || "Unknown User"}</span>
                   <div className="timestamp">{timeAgo(c.createdAt)}</div>
                 </div>
               </div>
 
               {user && user._id === c.user._id && (
                 <div className="comment-actions">
-                  <FiMoreVertical
-                    className="more-icon"
-                    onClick={() => toggleActions(c._id)}
-                  />
+                  <FiMoreVertical className="more-icon" onClick={() => toggleActions(c._id)} />
                   {showActionsId === c._id && (
                     <div className="menu-buttons">
                       <button onClick={() => startEdit(c._id, c.content)}>Edit</button>

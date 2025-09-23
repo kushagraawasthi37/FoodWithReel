@@ -1,32 +1,33 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 // Replace this with your deployed backend URL
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function UserLogin() {
-  const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   async function onSubmit(e) {
-    e.preventDefault()
+    e.preventDefault();
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/auth/user/login`,
-        { email, password },
-        { withCredentials: true }
-      )
+        { email, password }
+      );
 
-      console.log(response.data)
-      navigate("/") // Redirect to home after login
+      // Store JWT in localStorage
+      localStorage.setItem("token", response.data.token);
+
+      console.log(response.data);
+      navigate("/"); // Redirect to home after login
     } catch (err) {
-      const msg = err.response?.data?.message || "Something went wrong"
-      setError(msg)
-      setTimeout(() => setError(''), 3000) // auto-hide after 3 sec
+      const msg = err.response?.data?.message || "Something went wrong";
+      setError(msg);
+      setTimeout(() => setError(""), 3000); // auto-hide after 3 sec
     }
   }
 
@@ -45,10 +46,9 @@ export default function UserLogin() {
             <label>Email</label>
             <input
               id="email"
-              name="email"
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
             />
@@ -57,29 +57,38 @@ export default function UserLogin() {
           <div className="form-group">
             <label>Password</label>
             <input
-              name="password"
               id="password"
               type="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
             />
           </div>
 
           <div className="actions">
-            <button type="submit" className="btn btn-primary">Sign in</button>
-            <Link to="/user/register" className="btn btn-ghost">Register</Link>
+            <button type="submit" className="btn btn-primary">
+              Sign in
+            </button>
+            <Link to="/user/register" className="btn btn-ghost">
+              Register
+            </Link>
           </div>
 
           <div className="small-links">
-            <Link to="/food-partner/login" className="anchor">Partner login</Link>
-            <a href="#" className="anchor">Forgot?</a>
+            <Link to="/food-partner/login" className="anchor">
+              Partner login
+            </Link>
+            <a href="#" className="anchor">
+              Forgot?
+            </a>
           </div>
 
-          <div className="simple-footer">You can also sign in with Google / Apple later</div>
+          <div className="simple-footer">
+            You can also sign in with Google / Apple later
+          </div>
         </form>
       </div>
     </div>
-  )
+  );
 }

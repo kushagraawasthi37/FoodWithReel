@@ -4,12 +4,12 @@ import axios from "axios";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/ProfileUI.css";
 
-// <-- Replace this with your deployed backend URL -->
+// <-- Replace with your deployed backend URL -->
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 function ProfileUI() {
   const { id } = useParams();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,11 +18,17 @@ function ProfileUI() {
   // Fetch profile and videos
   useEffect(() => {
     const fetchProfile = async () => {
+      const token = localStorage.getItem("token"); // Bearer token
+      if (!token) {
+        console.error("User not authenticated");
+        setLoading(false);
+        return;
+      }
+
       try {
-        const res = await axios.get(
-          `${BACKEND_URL}/api/food-partner/${id}`,
-          { withCredentials: true }
-        );
+        const res = await axios.get(`${BACKEND_URL}/api/food-partner/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const foodPartner = res.data.foodPartner;
         setProfile(foodPartner);
         setVideos(foodPartner.foodItems || []);

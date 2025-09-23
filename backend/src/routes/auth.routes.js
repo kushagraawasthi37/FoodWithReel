@@ -1,15 +1,13 @@
+// auth.routes.js
 const express = require("express");
 const authController = require("../controller/auth.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 const multer = require("multer");
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-});
-
+const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
 
-//user auth APIs
+// User Auth
 router.post("/user/register", authController.registerUser);
 router.post("/user/login", authController.loginUser);
 router.get(
@@ -18,17 +16,24 @@ router.get(
   authController.logoutUser
 );
 
-//food partner auth APIs
+// Food Partner Auth
 router.post(
   "/food-partner/register",
   upload.single("avatar"),
   authController.registerFoodPartner
 );
 router.post("/food-partner/login", authController.loginFoodPartner);
-router.get("/food-partner/logout",authMiddleware.authFoodpartnerMiddleware, authController.logoutFoodPartner);
+router.get(
+  "/food-partner/logout",
+  authMiddleware.authFoodpartnerMiddleware,
+  authController.logoutFoodPartner
+);
 
-
-//Get currentuser
-router.get("/me", authController.getCurrentUser);
+// Current logged-in user
+router.get(
+  "/me",
+  authMiddleware.authUserMiddleware,
+  authController.getCurrentUser
+);
 
 module.exports = router;

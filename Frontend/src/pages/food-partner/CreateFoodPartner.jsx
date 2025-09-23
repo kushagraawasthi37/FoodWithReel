@@ -38,17 +38,26 @@ export default function CreateFood() {
     formData.append("video", video);
 
     setLoading(true);
+
     try {
-      const res = await axios.post(
-        `${BACKEND_URL}/api/food`,
-        formData,
-        { withCredentials: true }
-      );
+      const token = localStorage.getItem("token"); // Bearer token from login
+      if (!token) {
+        setMessage("You must be logged in as a food partner.");
+        return;
+      }
+
+      const res = await axios.post(`${BACKEND_URL}/api/food`, formData, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       console.log(res.data);
       navigate("/");
     } catch (err) {
       console.error(err);
-      setMessage("Failed to create food");
+      setMessage(err.response?.data?.message || "Failed to create food");
     } finally {
       setLoading(false);
     }
@@ -57,10 +66,7 @@ export default function CreateFood() {
   return (
     <div className="create-food-container">
       <div className="create-food-card">
-        <AiOutlineArrowLeft
-          className="back-icon"
-          onClick={() => navigate(-1)}
-        />
+        <AiOutlineArrowLeft className="back-icon" onClick={() => navigate(-1)} />
         <h2 className="title">Create New Food Item</h2>
 
         {message && <p className="message">{message}</p>}

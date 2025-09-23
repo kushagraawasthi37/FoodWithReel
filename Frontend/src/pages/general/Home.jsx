@@ -12,7 +12,6 @@ import {
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import "../../styles/reels.css";
 
-// <-- Replace this with your deployed backend URL -->
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function Home() {
@@ -29,10 +28,15 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-  // Fetch current user
+  // Fetch current user using Bearer token
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
     axios
-      .get(`${BACKEND_URL}/api/auth/me`, { withCredentials: true })
+      .get(`${BACKEND_URL}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
@@ -40,7 +44,7 @@ export default function Home() {
   // Fetch videos
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/food/foodItems`, { withCredentials: true })
+      .get(`${BACKEND_URL}/api/food/foodItems`)
       .then((res) => {
         const data = res.data.foodItems || [];
         const likes = {};
@@ -93,6 +97,11 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [popupMessage]);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
   // Like toggle
   const toggleLike = async (id) => {
     if (!user) return setPopupMessage("Please login to like");
@@ -107,7 +116,7 @@ export default function Home() {
       const res = await axios.post(
         `${BACKEND_URL}/api/food/like`,
         { foodId: id },
-        { withCredentials: true }
+        { headers: getAuthHeaders() }
       );
       setLikedVideos((prev) => ({ ...prev, [id]: res.data.liked }));
       setLikesCount((prev) => ({ ...prev, [id]: res.data.likes }));
@@ -130,7 +139,7 @@ export default function Home() {
       const res = await axios.post(
         `${BACKEND_URL}/api/food/save`,
         { foodId: id },
-        { withCredentials: true }
+        { headers: getAuthHeaders() }
       );
       setSavedVideos((prev) => ({ ...prev, [id]: res.data.saved }));
       setSavesCount((prev) => ({ ...prev, [id]: res.data.saves }));
@@ -141,11 +150,12 @@ export default function Home() {
 
   const logoutUser = async () => {
     try {
-      await axios.post(`${BACKEND_URL}/api/auth/logout`, {}, { withCredentials: true });
+      await axios.post(`${BACKEND_URL}/api/auth/logout`, {}, { headers: getAuthHeaders() });
     } catch (err) {
       console.error(err);
     }
     setUser(null);
+    localStorage.removeItem("token");
     navigate("/");
   };
 
@@ -156,7 +166,6 @@ export default function Home() {
 
   return (
     <>
-      {/* Videos */}
       <div ref={containerRef} className="reels-container">
         {displayedVideos.length ? (
           displayedVideos.map((v) => (
@@ -212,18 +221,19 @@ export default function Home() {
         )}
       </div>
 
-      {/* Popup */}
       {popupMessage && (
         <div className="popup">
           <p>{popupMessage}</p>
         </div>
       )}
 
-      {/* Bottom Navigation */}
       <div className="bottom-nav">
         <button
           className={activeTab === "home" ? "active" : ""}
-          onClick={() => { navigate("/"); setActiveTab("home"); }}
+          onClick={() => {
+            navigate("/");
+            setActiveTab("home");
+          }}
         >
           <AiOutlineHome />
           Home
@@ -231,7 +241,10 @@ export default function Home() {
 
         <button
           className={activeTab === "saved" ? "active" : ""}
-          onClick={() => { navigate("/saved"); setActiveTab("saved"); }}
+          onClick={() => {
+            navigate("/saved");
+            setActiveTab("saved");
+          }}
         >
           {savedVideos ? <BsBookmarkFill /> : <BsBookmark />}
           Saved
@@ -240,7 +253,10 @@ export default function Home() {
         {user?.isFoodPartner && (
           <button
             className={activeTab === "create" ? "active" : ""}
-            onClick={() => { navigate("/create-food"); setActiveTab("create"); }}
+            onClick={() => {
+              navigate("/create-food");
+              setActiveTab("create");
+            }}
           >
             ➕ Create Food
           </button>

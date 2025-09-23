@@ -13,7 +13,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaRegSadCry } from "react-icons/fa";
 import "../../styles/reels.css";
 
-// <-- Replace this with your deployed backend URL -->
 const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function Saved() {
@@ -24,18 +23,28 @@ export default function Saved() {
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
-  // Check auth
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  // Fetch current user
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
     axios
-      .get(`${BACKEND_URL}/api/auth/me`, { withCredentials: true })
+      .get(`${BACKEND_URL}/api/auth/me`, { headers: getAuthHeaders() })
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
 
   // Fetch saved videos
   useEffect(() => {
+    if (!user) return;
+
     axios
-      .get(`${BACKEND_URL}/api/food/save`, { withCredentials: true })
+      .get(`${BACKEND_URL}/api/food/save`, { headers: getAuthHeaders() })
       .then((res) => {
         const saved = res.data.savedVideos || [];
         const liked = {};
@@ -49,7 +58,7 @@ export default function Saved() {
         setSavedState(savedMap);
       })
       .catch((err) => console.error(err));
-  }, []);
+  }, [user]);
 
   // IntersectionObserver for autoplay
   useEffect(() => {
@@ -83,7 +92,7 @@ export default function Saved() {
       const res = await axios.post(
         `${BACKEND_URL}/api/food/like`,
         { foodId: id },
-        { withCredentials: true }
+        { headers: getAuthHeaders() }
       );
 
       setLikedVideos((prev) => ({ ...prev, [id]: res.data.liked }));
@@ -109,7 +118,7 @@ export default function Saved() {
       await axios.post(
         `${BACKEND_URL}/api/food/save`,
         { foodId: id },
-        { withCredentials: true }
+        { headers: getAuthHeaders() }
       );
     } catch (err) {
       console.error(err);
@@ -119,15 +128,15 @@ export default function Saved() {
   // Logout
   const handleLogout = async () => {
     try {
-      await axios.post(`${BACKEND_URL}/api/auth/logout`, {}, { withCredentials: true });
+      await axios.post(`${BACKEND_URL}/api/auth/logout`, {}, { headers: getAuthHeaders() });
     } catch (err) {
       console.error(err);
     }
     setUser(null);
+    localStorage.removeItem("token");
     navigate("/user/login");
   };
 
-  // Go to comments
   const goToComments = (foodId) => navigate(`/food/${foodId}/comments`);
 
   const noSaved = savedVideos.length === 0;
