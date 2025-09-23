@@ -32,7 +32,6 @@ export default function AppRoutes(){
         <Route path='/food/:foodId/comments' element={<CommentsPage/>}/>
         <Route path="/owner-video/:ownerId/:videoId"element={<OwnerVideoPage />}/>
                 {/* Fallback for 404 */}
-        <Route path="*" element={<div style={{ textAlign: "center", marginTop: 50 }}>Page Not Found</div>} />
       </Routes>
     </BrowserRouter>
     

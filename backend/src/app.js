@@ -34,12 +34,11 @@ if (process.env.NODE_ENV === "production") {
   const frontendPath = path.join(__dirname, "../../frontend/build");
   app.use(express.static(frontendPath));
 
-  // Catch-all for React routing
-  app.get("*", (req, res) => {
+  // SPA fallback
+  app.use((req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
-
 // Health check
 app.get("/health", (req, res) => res.send("Server is running!"));
 
