@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../utils/axiosInstance"; // use custom axios instance
+import axiosInstance from "../../services/axiosInstance"// use custom axios instance
 import "../../styles/OwnerVideoPage.css";
 
 export default function OwnerVideoPage() {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axiosInstance from "../utils/axiosInstance"; // updated import
+import axiosInstance from "../../services/axiosInstance"// use custom axios instance
 
 export default function FoodPartnerLogin() {
   const [email, setEmail] = useState("");

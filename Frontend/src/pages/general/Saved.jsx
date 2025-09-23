@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axiosInstance from "../utils/axiosInstance"; // Use axiosInstance
+import axiosInstance from "../../services/axiosInstance"// use custom axios instance
 import {
   AiOutlineComment,
   AiFillHeart,

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axiosInstance from "../utils/axiosInstance"; // use axiosInstance
+import axiosInstance from "../../services/axiosInstance"// use custom axios instance
 import { Link, useNavigate } from "react-router-dom";
 import {
   AiFillHeart,
