@@ -8,6 +8,7 @@ const foodRoutes = require("./routes/food.routes");
 const foodPartnerRoutes = require("./routes/food-partner.routes");
 
 const app = express();
+app.set("trust proxy", 1); // <-- Add this
 
 // CORS for frontend domains
 app.use(
