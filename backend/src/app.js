@@ -32,19 +32,7 @@ app.use("/api/food", foodRoutes);
 app.use("/api/food-partner", foodPartnerRoutes);
 
 // Serve React static files in production
-if (process.env.NODE_ENV === "production") {
-  const frontendPath = path.join(__dirname, "../../frontend/build");
-  app.use(express.static(frontendPath));
 
-  // Catch-all for client-side routing (safe)
-  app.use((req, res, next) => {
-    if (!req.path.startsWith("/api")) {
-      res.sendFile(path.join(frontendPath, "index.html"));
-    } else {
-      next();
-    }
-  });
-}
 
 // Health check
 app.get("/health", (req, res) => res.send("Server is running!"));
