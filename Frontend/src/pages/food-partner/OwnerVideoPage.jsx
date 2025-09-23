@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../../services/axiosInstance"// use custom axios instance
+import axios from "axios";
 import "../../styles/OwnerVideoPage.css";
 
 export default function OwnerVideoPage() {
@@ -14,7 +14,10 @@ export default function OwnerVideoPage() {
   useEffect(() => {
     const fetchOwnerVideos = async () => {
       try {
-        const res = await axiosInstance.get(`/api/food/owner-food/${ownerId}`);
+        const res = await axios.get(
+          `http://localhost:3000/api/food/owner-food/${ownerId}`,
+          { withCredentials: true }
+        );
         setVideos(res.data.foodItems || []);
       } catch (err) {
         console.error("Error fetching owner videos:", err);
@@ -22,7 +25,6 @@ export default function OwnerVideoPage() {
         setLoading(false);
       }
     };
-
     fetchOwnerVideos();
   }, [ownerId]);
 
@@ -41,7 +43,7 @@ export default function OwnerVideoPage() {
           }
         });
       },
-      { threshold: 0.9 }
+      { threshold: 0.9 } // ~90% visible
     );
 
     videoRefs.current.forEach((v) => v && observer.observe(v));

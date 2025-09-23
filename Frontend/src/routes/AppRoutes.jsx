@@ -31,9 +31,7 @@ export default function AppRoutes(){
         <Route path='/food-partner/:id' element={<ProfileUI/>}/>
         <Route path='/food/:foodId/comments' element={<CommentsPage/>}/>
         <Route path="/owner-video/:ownerId/:videoId"element={<OwnerVideoPage />}/>
-                {/* Fallback for 404 */}
       </Routes>
     </BrowserRouter>
-    
   )
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axiosInstance from "../../services/axiosInstance"// use custom axios instance
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import {
   AiFillHeart,
@@ -28,16 +28,16 @@ export default function Home() {
 
   // Fetch current user
   useEffect(() => {
-    axiosInstance
-      .get("/api/auth/me")
+    axios
+      .get("http://localhost:3000/api/auth/me", { withCredentials: true })
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
 
   // Fetch videos
   useEffect(() => {
-    axiosInstance
-      .get("/api/food/foodItems")
+    axios
+      .get("http://localhost:3000/api/food/foodItems", { withCredentials: true })
       .then((res) => {
         const data = res.data.foodItems || [];
         const likes = {};
@@ -101,7 +101,11 @@ export default function Home() {
     }));
 
     try {
-      const res = await axiosInstance.post("/api/food/like", { foodId: id });
+      const res = await axios.post(
+        "http://localhost:3000/api/food/like",
+        { foodId: id },
+        { withCredentials: true }
+      );
       setLikedVideos((prev) => ({ ...prev, [id]: res.data.liked }));
       setLikesCount((prev) => ({ ...prev, [id]: res.data.likes }));
     } catch (err) {
@@ -120,7 +124,11 @@ export default function Home() {
     }));
 
     try {
-      const res = await axiosInstance.post("/api/food/save", { foodId: id });
+      const res = await axios.post(
+        "http://localhost:3000/api/food/save",
+        { foodId: id },
+        { withCredentials: true }
+      );
       setSavedVideos((prev) => ({ ...prev, [id]: res.data.saved }));
       setSavesCount((prev) => ({ ...prev, [id]: res.data.saves }));
     } catch (err) {
@@ -130,12 +138,11 @@ export default function Home() {
 
   const logoutUser = async () => {
     try {
-      await axiosInstance.post("/api/auth/logout");
+      await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
     } catch (err) {
       console.error(err);
     }
     setUser(null);
-    localStorage.removeItem("token");
     navigate("/");
   };
 
@@ -146,6 +153,7 @@ export default function Home() {
 
   return (
     <>
+      {/* Videos */}
       <div ref={containerRef} className="reels-container">
         {displayedVideos.length ? (
           displayedVideos.map((v) => (
@@ -201,19 +209,18 @@ export default function Home() {
         )}
       </div>
 
+      {/* Popup */}
       {popupMessage && (
         <div className="popup">
           <p>{popupMessage}</p>
         </div>
       )}
 
+      {/* Bottom Navigation */}
       <div className="bottom-nav">
         <button
           className={activeTab === "home" ? "active" : ""}
-          onClick={() => {
-            navigate("/");
-            setActiveTab("home");
-          }}
+          onClick={() => { navigate("/"); setActiveTab("home"); }}
         >
           <AiOutlineHome />
           Home
@@ -221,10 +228,7 @@ export default function Home() {
 
         <button
           className={activeTab === "saved" ? "active" : ""}
-          onClick={() => {
-            navigate("/saved");
-            setActiveTab("saved");
-          }}
+          onClick={() => { navigate("/saved"); setActiveTab("saved"); }}
         >
           {savedVideos ? <BsBookmarkFill /> : <BsBookmark />}
           Saved
@@ -233,10 +237,7 @@ export default function Home() {
         {user?.isFoodPartner && (
           <button
             className={activeTab === "create" ? "active" : ""}
-            onClick={() => {
-              navigate("/create-food");
-              setActiveTab("create");
-            }}
+            onClick={() => { navigate("/create-food"); setActiveTab("create"); }}
           >
             ➕ Create Food
           </button>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../services/axiosInstance"// use custom axios instance
+import axios from "axios";
 import "../../styles/CreateFood.css";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
@@ -35,17 +35,17 @@ export default function CreateFood() {
     formData.append("video", video);
 
     setLoading(true);
-
     try {
-      const res = await axiosInstance.post("/api/food", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
+      const res = await axios.post(
+        "http://localhost:3000/api/food",
+        formData,
+        { withCredentials: true }
+      );
       console.log(res.data);
       navigate("/");
     } catch (err) {
       console.error(err);
-      setMessage(err.response?.data?.message || "Failed to create food");
+      setMessage("Failed to create food");
     } finally {
       setLoading(false);
     }
@@ -61,9 +61,7 @@ export default function CreateFood() {
 
         <form className="create-food-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>
-              Name <span className="required">*</span>
-            </label>
+            <label>Name <span className="required">*</span></label>
             <input
               type="text"
               value={name}
@@ -83,9 +81,7 @@ export default function CreateFood() {
           </div>
 
           <div className="form-group video-upload">
-            <label>
-              Video <span className="required">*</span>
-            </label>
+            <label>Video <span className="required">*</span></label>
             <input
               type="file"
               accept="video/*"

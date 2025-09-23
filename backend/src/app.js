@@ -1,45 +1,28 @@
-// src/app.js
+//create server
 const express = require("express");
-const cors = require("cors");
-const path = require("path");
-
+const cookieParser = require("cookie-parser");
+const app = express();
 const authRoutes = require("./routes/auth.routes");
 const foodRoutes = require("./routes/food.routes");
 const foodPartnerRoutes = require("./routes/food-partner.routes");
+const cors = require("cors");
 
-const app = express();
-
-// CORS configuration
 app.use(
   cors({
-    origin: [
-      "https://foodwithreel-frontend.onrender.com", // deployed frontend
-      "http://localhost:5173", // local dev
-    ],
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
-
-// Parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-// API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/food-partner", foodPartnerRoutes);
 
-// Serve React static files in production
-if (process.env.NODE_ENV === "production") {
-  const frontendPath = path.join(__dirname, "../../frontend/build");
-  app.use(express.static(frontendPath));
-
-  // SPA fallback
-  app.use((req, res) => {
-    res.sendFile(path.join(frontendPath, "index.html"));
-  });
-}
-// Health check
-app.get("/health", (req, res) => res.send("Server is running!"));
+app.get("/", (req, res) => {
+  res.send("Hii");
+});
 
 module.exports = app;

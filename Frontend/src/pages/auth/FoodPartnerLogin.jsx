@@ -1,30 +1,27 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axiosInstance from "../../services/axiosInstance"// use custom axios instance
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
-export default function FoodPartnerLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+export default function FoodPartnerLogin(){
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
 
-  async function onSubmit(e) {
-    e.preventDefault();
+  async function onSubmit(e){
+    e.preventDefault()
     try {
-      const response = await axiosInstance.post("/api/auth/food-partner/login", {
-        email,
-        password,
-      });
+      const response = await axios.post("http://localhost:3000/api/auth/food-partner/login", {
+        email, password
+      }, { withCredentials:true })
 
-      // Save JWT token in localStorage (axiosInstance will now use it automatically)
-      localStorage.setItem("token", response.data.token);
-
-      console.log(response.data);
-      navigate("/create-food"); // Redirect after successful login
-    } catch (err) {
-      const msg = err.response?.data?.message || "Something went wrong";
-      setError(msg);
-      setTimeout(() => setError(""), 3000);
+      console.log(response.data)
+      navigate("/create-food")
+    } catch(err){
+      const msg = err.response?.data?.message || "Something went wrong"
+      setError(msg)
+      setTimeout(() => setError(''), 3000)
     }
   }
 
@@ -46,7 +43,7 @@ export default function FoodPartnerLogin() {
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               placeholder="partner@business.com"
               required
             />
@@ -59,31 +56,23 @@ export default function FoodPartnerLogin() {
               name="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
               required
             />
           </div>
 
           <div className="actions">
-            <button type="submit" className="btn btn-primary">
-              Sign in
-            </button>
-            <Link to="/food-partner/register" className="btn btn-ghost">
-              Register
-            </Link>
+            <button type="submit" className="btn btn-primary">Sign in</button>
+            <Link to="/food-partner/register" className="btn btn-ghost">Register</Link>
           </div>
 
           <div className="small-links">
-            <Link to="/user/login" className="anchor">
-              User login
-            </Link>
-            <a href="#" className="anchor">
-              Need help?
-            </a>
+            <Link to="/user/login" className="anchor">User login</Link>
+            <a href="#" className="anchor">Need help?</a>
           </div>
         </form>
       </div>
     </div>
-  );
+  )
 }

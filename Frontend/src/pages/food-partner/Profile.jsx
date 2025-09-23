@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../../services/axiosInstance"// use custom axios instance
+import axios from "axios";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/ProfileUI.css";
 
 function ProfileUI() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
   const [profile, setProfile] = useState(null);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,10 @@ function ProfileUI() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axiosInstance.get(`/api/food-partner/${id}`);
+        const res = await axios.get(
+          `http://localhost:3000/api/food-partner/${id}`,
+          { withCredentials: true }
+        );
         const foodPartner = res.data.foodPartner;
         setProfile(foodPartner);
         setVideos(foodPartner.foodItems || []);
