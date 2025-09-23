@@ -35,7 +35,11 @@ async function registerUser(req, res) {
     }
   );
 
-  res.cookie("token", token);
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: "none", // allow cross-site
+    secure: true, // must be true for HTTPS
+  });
 
   res.status(201).json({
     message: "User created successfully",
@@ -72,7 +76,12 @@ async function loginUser(req, res) {
   const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRY_TIME,
   });
-  res.cookie("token", token);
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: "none", // allow cross-site
+    secure: true, // must be true for HTTPS
+  });
 
   return res.status(200).json({
     message: "User login successfully",
@@ -135,7 +144,11 @@ async function registerFoodPartner(req, res) {
     }
   );
 
-  res.cookie("token", token);
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: "none", // allow cross-site
+    secure: true, // must be true for HTTPS
+  });
 
   res.status(201).json({
     message: "User created successfully",
@@ -180,8 +193,12 @@ async function loginFoodPartner(req, res) {
     });
 
     // Set cookie
-    res.cookie("token", token, { httpOnly: true, sameSite: "lax" });
-
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "none", // allow cross-site
+      secure: true, // must be true for HTTPS
+    });
+    
     // Return user data and mark as food-partner
     res.status(200).json({
       message: "Partner login successfully",

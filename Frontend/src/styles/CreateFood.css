@@ -183,3 +183,23 @@ textarea {
     /* slightly darker on hover */
     transform: scale(1.1);
 }
+
+.create-food-form input[type="text"],
+.create-food-form textarea,
+.create-food-form input[type="file"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    color: #111827;
+    /* <-- add this for dark text */
+}
+
+.create-food-form input::placeholder,
+.create-food-form textarea::placeholder {
+    color: #6b7280;
+    /* optional: placeholder color */
+}
