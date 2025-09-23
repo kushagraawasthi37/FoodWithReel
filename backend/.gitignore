@@ -1,2 +1,4 @@
 .env
 node_modules
+
+mongodb+srv://FoodWithReels:FoodWithReels12345@foodwithreels.eiv55tl.mongodb.net/

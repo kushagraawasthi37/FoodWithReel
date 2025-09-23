@@ -3,6 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../../styles/OwnerVideoPage.css";
 
+// <-- Replace with your deployed backend URL -->
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function OwnerVideoPage() {
   const { ownerId } = useParams();
   const navigate = useNavigate();
@@ -15,7 +18,7 @@ export default function OwnerVideoPage() {
     const fetchOwnerVideos = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/food/owner-food/${ownerId}`,
+          `${BACKEND_URL}/api/food/owner-food/${ownerId}`,
           { withCredentials: true }
         );
         setVideos(res.data.foodItems || []);
@@ -43,7 +46,7 @@ export default function OwnerVideoPage() {
           }
         });
       },
-      { threshold: 0.9 } // ~90% visible
+      { threshold: 0.9 }
     );
 
     videoRefs.current.forEach((v) => v && observer.observe(v));

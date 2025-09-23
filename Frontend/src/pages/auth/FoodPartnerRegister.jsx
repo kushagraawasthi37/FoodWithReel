@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
-export default function FoodPartnerRegister(){
+// Replace with your deployed backend URL
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
+export default function FoodPartnerRegister() {
   const [fullName, setFullname] = useState('')
   const [contactName, setContactName] = useState('')
   const [email, setEmail] = useState('')
@@ -14,7 +17,7 @@ export default function FoodPartnerRegister(){
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  async function onSubmit(e){
+  async function onSubmit(e) {
     e.preventDefault()
     try {
       const formData = new FormData()
@@ -26,13 +29,17 @@ export default function FoodPartnerRegister(){
       formData.append("Address", Address)
       if (avatar) formData.append("avatar", avatar)
 
-      const res = await axios.post("http://localhost:3000/api/auth/food-partner/register", formData, {
-        withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" }
-      })
+      const res = await axios.post(
+        `${BACKEND_URL}/api/auth/food-partner/register`,
+        formData,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      )
       console.log(res.data)
       navigate("/create-food")
-    } catch(err) {
+    } catch (err) {
       const msg = err.response?.data?.message || "Something went wrong"
       setError(msg)
       setTimeout(() => setError(''), 3000)

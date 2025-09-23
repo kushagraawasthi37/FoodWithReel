@@ -3,23 +3,28 @@ import { Link } from 'react-router-dom'
 import axios from "axios"
 import { useNavigate } from 'react-router-dom'
 
-export default function UserRegister(){
+// Replace this with your deployed backend URL
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
+export default function UserRegister() {
   const navigate = useNavigate()
   const [fullName, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  async function onSubmit(e){
+  async function onSubmit(e) {
     e.preventDefault()
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/user/register", {
-        fullName, email, password
-      }, { withCredentials:true })
+      const response = await axios.post(
+        `${BACKEND_URL}/api/auth/user/register`,
+        { fullName, email, password },
+        { withCredentials: true }
+      )
 
       console.log(response.data)
       navigate('/')
-    } catch(err) {
+    } catch (err) {
       const msg = err.response?.data?.message || "Something went wrong"
       setError(msg)
       setTimeout(() => setError(''), 3000)

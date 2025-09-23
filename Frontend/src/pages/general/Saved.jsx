@@ -1,10 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { AiOutlineComment, AiFillHeart, AiOutlineHeart, AiOutlineHome, AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
+import {
+  AiOutlineComment,
+  AiFillHeart,
+  AiOutlineHeart,
+  AiOutlineHome,
+  AiOutlineLogin,
+  AiOutlineLogout,
+} from "react-icons/ai";
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { FaRegSadCry } from "react-icons/fa";
 import "../../styles/reels.css";
+
+// <-- Replace this with your deployed backend URL -->
+const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function Saved() {
   const [savedVideos, setSavedVideos] = useState([]);
@@ -17,20 +27,20 @@ export default function Saved() {
   // Check auth
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/auth/me", { withCredentials: true })
-      .then(res => setUser(res.data.user))
+      .get(`${BACKEND_URL}/api/auth/me`, { withCredentials: true })
+      .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
 
   // Fetch saved videos
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/food/save", { withCredentials: true })
-      .then(res => {
+      .get(`${BACKEND_URL}/api/food/save`, { withCredentials: true })
+      .then((res) => {
         const saved = res.data.savedVideos || [];
         const liked = {};
         const savedMap = {};
-        saved.forEach(v => {
+        saved.forEach((v) => {
           if (v.likedByMe) liked[v._id] = true;
           savedMap[v._id] = true;
         });
@@ -38,16 +48,16 @@ export default function Saved() {
         setLikedVideos(liked);
         setSavedState(savedMap);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, []);
 
-  // IntersectionObserver for auto-play
+  // IntersectionObserver for autoplay
   useEffect(() => {
     if (!savedVideos.length) return;
 
     const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
+      (entries) => {
+        entries.forEach((entry) => {
           const video = entry.target.querySelector("video");
           if (!video) return;
           entry.isIntersecting ? video.play().catch(() => {}) : video.pause();
@@ -57,29 +67,28 @@ export default function Saved() {
     );
 
     const nodes = containerRef.current?.querySelectorAll(".reel");
-    nodes?.forEach(n => observer.observe(n));
+    nodes?.forEach((n) => observer.observe(n));
 
     return () => observer.disconnect();
   }, [savedVideos]);
 
   // Like toggle
-  const toggleLike = async id => {
+  const toggleLike = async (id) => {
     if (!user) return navigate("/user/login");
 
     const currentlyLiked = likedVideos[id];
-    setLikedVideos(prev => ({ ...prev, [id]: !currentlyLiked }));
+    setLikedVideos((prev) => ({ ...prev, [id]: !currentlyLiked }));
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/food/like",
+        `${BACKEND_URL}/api/food/like`,
         { foodId: id },
         { withCredentials: true }
       );
 
-      // Update UI based on backend response
-      setLikedVideos(prev => ({ ...prev, [id]: res.data.liked }));
-      setSavedVideos(prev =>
-        prev.map(v =>
+      setLikedVideos((prev) => ({ ...prev, [id]: res.data.liked }));
+      setSavedVideos((prev) =>
+        prev.map((v) =>
           v._id === id ? { ...v, likeCount: res.data.likes } : v
         )
       );
@@ -89,16 +98,16 @@ export default function Saved() {
   };
 
   // Save/Unsave toggle
-  const toggleSave = async id => {
+  const toggleSave = async (id) => {
     if (!user) return navigate("/user/login");
 
     const currentlySaved = savedState[id];
-    setSavedState(prev => ({ ...prev, [id]: !currentlySaved }));
-    setSavedVideos(prev => prev.filter(v => v._id !== id)); // remove if unsaved
+    setSavedState((prev) => ({ ...prev, [id]: !currentlySaved }));
+    setSavedVideos((prev) => prev.filter((v) => v._id !== id));
 
     try {
       await axios.post(
-        "http://localhost:3000/api/food/save",
+        `${BACKEND_URL}/api/food/save`,
         { foodId: id },
         { withCredentials: true }
       );
@@ -110,7 +119,7 @@ export default function Saved() {
   // Logout
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
+      await axios.post(`${BACKEND_URL}/api/auth/logout`, {}, { withCredentials: true });
     } catch (err) {
       console.error(err);
     }
@@ -119,7 +128,7 @@ export default function Saved() {
   };
 
   // Go to comments
-  const goToComments = foodId => navigate(`/food/${foodId}/comments`);
+  const goToComments = (foodId) => navigate(`/food/${foodId}/comments`);
 
   const noSaved = savedVideos.length === 0;
 
@@ -134,7 +143,7 @@ export default function Saved() {
             <button onClick={() => navigate("/")}>Browse Home</button>
           </div>
         ) : (
-          savedVideos.map(v => (
+          savedVideos.map((v) => (
             <div key={v._id} className="reel">
               <video src={v.video} muted playsInline loop />
 
@@ -183,7 +192,6 @@ export default function Saved() {
         )}
       </div>
 
-      {/* Bottom navigation */}
       {!noSaved && (
         <div className="bottom-nav">
           <button onClick={() => navigate("/")} className="nav-btn">

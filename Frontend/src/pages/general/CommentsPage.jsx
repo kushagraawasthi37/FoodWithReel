@@ -5,9 +5,12 @@ import { FiMoreVertical } from "react-icons/fi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/comment.css";
 
+// <-- Replace with your deployed backend URL -->
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function CommentsPage() {
   const { foodId } = useParams();
-  const navigate = useNavigate(); // for back button
+  const navigate = useNavigate();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [user, setUser] = useState(null);
@@ -22,15 +25,15 @@ export default function CommentsPage() {
 
   const fetchUser = () => {
     axios
-      .get("http://localhost:3000/api/auth/me", { withCredentials: true })
-      .then(res => setUser(res.data.user))
+      .get(`${BACKEND_URL}/api/auth/me`, { withCredentials: true })
+      .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   };
 
   const fetchComments = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/food/${foodId}/comments`
+        `${BACKEND_URL}/api/food/${foodId}/comments`
       );
       setComments(res.data.comments);
     } catch (err) {
@@ -42,7 +45,7 @@ export default function CommentsPage() {
     if (!user) return alert("Login to post comment");
     if (!newComment.trim()) return;
     await axios.post(
-      "http://localhost:3000/api/food/comment",
+      `${BACKEND_URL}/api/food/comment`,
       { foodId, content: newComment },
       { withCredentials: true }
     );
@@ -61,10 +64,10 @@ export default function CommentsPage() {
     setEditingContent("");
   };
 
-  const saveEdit = async id => {
+  const saveEdit = async (id) => {
     if (!editingContent.trim()) return;
     await axios.put(
-      `http://localhost:3000/api/food/comment/${id}`,
+      `${BACKEND_URL}/api/food/comment/${id}`,
       { content: editingContent },
       { withCredentials: true }
     );
@@ -73,20 +76,19 @@ export default function CommentsPage() {
     fetchComments();
   };
 
-  const deleteComment = async id => {
+  const deleteComment = async (id) => {
     if (!window.confirm("Are you sure you want to delete this comment?")) return;
-    await axios.delete(
-      `http://localhost:3000/api/food/comment/${id}`,
-      { withCredentials: true }
-    );
+    await axios.delete(`${BACKEND_URL}/api/food/comment/${id}`, {
+      withCredentials: true,
+    });
     fetchComments();
   };
 
-  const toggleActions = id => {
-    setShowActionsId(prev => (prev === id ? null : id));
+  const toggleActions = (id) => {
+    setShowActionsId((prev) => (prev === id ? null : id));
   };
 
-  const timeAgo = timestamp => {
+  const timeAgo = (timestamp) => {
     const now = new Date();
     const commentTime = new Date(timestamp);
     const diff = Math.floor((now - commentTime) / 1000);
@@ -96,7 +98,7 @@ export default function CommentsPage() {
     return `${Math.floor(diff / 86400)}d ago`;
   };
 
-  const renderAvatar = user => {
+  const renderAvatar = (user) => {
     if (user.avatar) {
       return <img src={user.avatar} alt={user.fullName} className="avatar" />;
     }
@@ -109,7 +111,6 @@ export default function CommentsPage() {
 
   return (
     <div className="comments-page">
-      {/* Back Button */}
       <div className="back-button" onClick={() => navigate("/")}>
         <AiOutlineArrowLeft size={24} />
         <span>Back</span>
@@ -122,13 +123,13 @@ export default function CommentsPage() {
           type="text"
           value={newComment}
           placeholder="Write a comment..."
-          onChange={e => setNewComment(e.target.value)}
+          onChange={(e) => setNewComment(e.target.value)}
         />
         <button onClick={postComment}>Post</button>
       </div>
 
       <div className="comments-list">
-        {comments.map(c => (
+        {comments.map((c) => (
           <div key={c._id} className="comment">
             <div className="comment-header">
               <div className="comment-user-info">
@@ -141,7 +142,6 @@ export default function CommentsPage() {
                 </div>
               </div>
 
-              {/* Only owner sees the 3 dots */}
               {user && user._id === c.user._id && (
                 <div className="comment-actions">
                   <FiMoreVertical
@@ -163,7 +163,7 @@ export default function CommentsPage() {
                 <input
                   type="text"
                   value={editingContent}
-                  onChange={e => setEditingContent(e.target.value)}
+                  onChange={(e) => setEditingContent(e.target.value)}
                 />
                 <button onClick={() => saveEdit(c._id)}>Save</button>
                 <button onClick={cancelEdit}>Cancel</button>

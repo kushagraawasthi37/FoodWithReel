@@ -4,6 +4,9 @@ import axios from "axios";
 import "../../styles/CreateFood.css";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
+// <-- Replace with your deployed backend URL -->
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function CreateFood() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -37,7 +40,7 @@ export default function CreateFood() {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/food",
+        `${BACKEND_URL}/api/food`,
         formData,
         { withCredentials: true }
       );
@@ -54,14 +57,19 @@ export default function CreateFood() {
   return (
     <div className="create-food-container">
       <div className="create-food-card">
-        <AiOutlineArrowLeft className="back-icon" onClick={() => navigate(-1)} />
+        <AiOutlineArrowLeft
+          className="back-icon"
+          onClick={() => navigate(-1)}
+        />
         <h2 className="title">Create New Food Item</h2>
 
         {message && <p className="message">{message}</p>}
 
         <form className="create-food-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Name <span className="required">*</span></label>
+            <label>
+              Name <span className="required">*</span>
+            </label>
             <input
               type="text"
               value={name}
@@ -81,7 +89,9 @@ export default function CreateFood() {
           </div>
 
           <div className="form-group video-upload">
-            <label>Video <span className="required">*</span></label>
+            <label>
+              Video <span className="required">*</span>
+            </label>
             <input
               type="file"
               accept="video/*"

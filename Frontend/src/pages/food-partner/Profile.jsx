@@ -4,6 +4,9 @@ import axios from "axios";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/ProfileUI.css";
 
+// <-- Replace this with your deployed backend URL -->
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 function ProfileUI() {
   const { id } = useParams();
   const navigate = useNavigate(); 
@@ -17,7 +20,7 @@ function ProfileUI() {
     const fetchProfile = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/food-partner/${id}`,
+          `${BACKEND_URL}/api/food-partner/${id}`,
           { withCredentials: true }
         );
         const foodPartner = res.data.foodPartner;

@@ -12,6 +12,9 @@ import {
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import "../../styles/reels.css";
 
+// <-- Replace this with your deployed backend URL -->
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
 export default function Home() {
   const [videos, setVideos] = useState([]);
   const containerRef = useRef(null);
@@ -29,7 +32,7 @@ export default function Home() {
   // Fetch current user
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/auth/me", { withCredentials: true })
+      .get(`${BACKEND_URL}/api/auth/me`, { withCredentials: true })
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
@@ -37,7 +40,7 @@ export default function Home() {
   // Fetch videos
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/food/foodItems", { withCredentials: true })
+      .get(`${BACKEND_URL}/api/food/foodItems`, { withCredentials: true })
       .then((res) => {
         const data = res.data.foodItems || [];
         const likes = {};
@@ -102,7 +105,7 @@ export default function Home() {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/food/like",
+        `${BACKEND_URL}/api/food/like`,
         { foodId: id },
         { withCredentials: true }
       );
@@ -125,7 +128,7 @@ export default function Home() {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/food/save",
+        `${BACKEND_URL}/api/food/save`,
         { foodId: id },
         { withCredentials: true }
       );
@@ -138,7 +141,7 @@ export default function Home() {
 
   const logoutUser = async () => {
     try {
-      await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
+      await axios.post(`${BACKEND_URL}/api/auth/logout`, {}, { withCredentials: true });
     } catch (err) {
       console.error(err);
     }

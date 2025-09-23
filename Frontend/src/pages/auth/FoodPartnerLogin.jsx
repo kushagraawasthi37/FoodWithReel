@@ -3,22 +3,26 @@ import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
-export default function FoodPartnerLogin(){
+// Replace with your deployed backend URL
+const BACKEND_URL = import.meta.env.VITE_API_URL;
+
+export default function FoodPartnerLogin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  async function onSubmit(e){
+  async function onSubmit(e) {
     e.preventDefault()
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/food-partner/login", {
-        email, password
-      }, { withCredentials:true })
-
+      const response = await axios.post(
+        `${BACKEND_URL}/api/auth/food-partner/login`,
+        { email, password },
+        { withCredentials: true }
+      )
       console.log(response.data)
-      navigate("/create-food")
-    } catch(err){
+      navigate("/create-food") // Redirect after successful login
+    } catch (err) {
       const msg = err.response?.data?.message || "Something went wrong"
       setError(msg)
       setTimeout(() => setError(''), 3000)
