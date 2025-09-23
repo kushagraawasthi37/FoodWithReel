@@ -30,13 +30,18 @@ app.use("/api/auth", authRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/food-partner", foodPartnerRoutes);
 
-// Serve React static files (production)
+// Serve React static files in production
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../../frontend/build")));
+  const frontendPath = path.join(__dirname, "../../frontend/build");
+  app.use(express.static(frontendPath));
 
-  // Catch-all route for React routing
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../../frontend/build", "index.html"));
+  // Catch-all for client-side routing (safe)
+  app.use((req, res, next) => {
+    if (!req.path.startsWith("/api")) {
+      res.sendFile(path.join(frontendPath, "index.html"));
+    } else {
+      next();
+    }
   });
 }
 
