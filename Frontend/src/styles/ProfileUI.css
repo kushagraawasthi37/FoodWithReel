@@ -1,0 +1,229 @@
+/* ===== Reset & Base ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    font-family: 'Arial', sans-serif;
+    background: #0f0f0f;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+/* ===== Profile Card ===== */
+.profile-card {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+    width: 100%;
+    max-width: 935px;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: linear-gradient(145deg, #1a1a1a, #222);
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.9);
+}
+
+.profile-left {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.circle {
+    width: 120px;
+    /* circle diameter */
+    height: 120px;
+    /* same as width */
+    border-radius: 50%;
+    /* makes it a perfect circle */
+    overflow: hidden;
+    /* hides anything outside the circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    /* fallback background */
+}
+
+.circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* fill circle while keeping aspect ratio */
+    display: block;
+}
+
+.profile-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.business-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ff4d6d;
+}
+
+.address {
+    font-size: 14px;
+    color: #bbb;
+}
+
+.profile-right p {
+    font-size: 14px;
+    color: #ccc;
+}
+
+.stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 12px;
+    background: #1e1e1e;
+    box-shadow: inset 0 -2px 4px rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.stat-box:hover {
+    transform: scale(1.05);
+}
+
+.label {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* ===== Reel Grid ===== */
+.reel-grid {
+    display: grid;
+    width: 100%;
+    max-width: 935px;
+    gap: 4px;
+    overflow: hidden;
+}
+
+/* Reel Boxes */
+.reel-box {
+    position: relative;
+    background: #1e1e1e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.reel-box:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.reel-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* ===== Responsive Grid Sizes ===== */
+
+/* Mobile (max-width: 480px) - bigger reels like Instagram */
+@media (max-width: 480px) {
+    .reel-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: 200px;
+        /* bigger reels on mobile */
+    }
+
+    .profile-card {
+        flex-direction: column;
+        align-items: center;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .circle {
+        width: 100px;
+        height: 100px;
+        font-size: 28px;
+    }
+
+    .business-name {
+        font-size: 20px;
+        text-align: center;
+    }
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+    color: #0095f6;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.back-button:hover {
+    color: #007acc;
+}
+
+
+/* Tablet (481px - 1024px) */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .reel-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: 250px;
+    }
+}
+
+/* Desktop (>1025px) */
+@media (min-width: 1025px) {
+    .reel-grid {
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: 300px;
+        /* bigger videos on desktop */
+    }
+}

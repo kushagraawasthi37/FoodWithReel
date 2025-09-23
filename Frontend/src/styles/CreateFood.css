@@ -1,0 +1,185 @@
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --card-bg: #ffffff;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+    --input-border: #d1d5db;
+    --input-focus: #4f46e5;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.create-food-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #f3f4f6;
+    padding: 20px;
+}
+
+.create-food-card {
+    background: var(--card-bg);
+    padding: 50px 30px 30px 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px var(--card-shadow);
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    overflow: hidden;
+}
+
+.title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 25px;
+}
+
+/* Floating Back Icon */
+.back-icon {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 24px;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.back-icon:hover {
+    background-color: rgba(79, 70, 229, 0.1);
+    transform: scale(1.1);
+}
+
+.message {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.create-food-form .form-group {
+    margin-bottom: 20px;
+}
+
+.create-food-form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #374151;
+}
+
+.create-food-form input[type="text"],
+.create-food-form textarea,
+.create-food-form input[type="file"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.create-food-form input:focus,
+.create-food-form textarea:focus {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.video-preview {
+    margin-top: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px 0;
+    background: var(--primary-color);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.submit-btn:hover {
+    background: var(--primary-hover);
+}
+
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.create-food-btn-container {
+    position: fixed;
+    bottom: 80px;
+    /* above bottom nav */
+    right: 20px;
+    z-index: 1000;
+}
+
+.create-food-btn {
+    background: #ff6b6b;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.create-food-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Floating Back Icon */
+.back-icon {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 50px;
+    /* larger icon */
+    color: #ffffff;
+    /* icon color inside */
+    background-color: #4f46e5;
+    /* distinct visible background */
+    cursor: pointer;
+    padding: 16px;
+    /* larger button size */
+    border-radius: 50%;
+    /* circular shape */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    /* subtle shadow */
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-icon:hover {
+    background-color: #4338ca;
+    /* slightly darker on hover */
+    transform: scale(1.1);
+}

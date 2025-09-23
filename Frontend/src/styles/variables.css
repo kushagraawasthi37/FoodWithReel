@@ -1,0 +1,99 @@
+/* Shared CSS custom properties for the app.
+   Import this file at the top of your main stylesheet (e.g. globals.css):
+   @import "./styles/variables.css";
+*/
+
+:root {
+    /* Colors */
+    --color-bg: #0b0b0c;
+    --color-surface: #0f1720;
+    --color-primary: #ff3b30;
+    /* action / brand */
+    --color-accent: #ff9500;
+    /* secondary accent */
+    --color-muted: #9aa4b2;
+    --color-text: #ffffff;
+    --color-text-dim: rgba(255, 255, 255, 0.85);
+    --color-overlay: rgba(0, 0, 0, 0.45);
+    --color-white: #ffffff;
+    --color-success: #28a745;
+    --color-danger: #e02424;
+
+    /* Typography */
+    --font-family-sans: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-size-base: 16px;
+    --font-scale-xs: 12px;
+    --font-scale-sm: 14px;
+    --font-scale-md: 16px;
+    --font-scale-lg: 20px;
+    --font-scale-xl: 28px;
+    --line-height-tight: 1;
+    --line-height-base: 1.4;
+
+    /* Spacing */
+    --space-xxs: 4px;
+    --space-xs: 8px;
+    --space-sm: 12px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+
+    /* Radii & borders */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-pill: 9999px;
+    --border-muted: 1px solid rgba(255, 255, 255, 0.06);
+
+    /* Elevation / z-index */
+    --z-overlay: 50;
+    --z-player: 40;
+    --z-controls: 60;
+
+    /* Animation / transitions */
+    --transition-fast: 150ms;
+    --transition-medium: 250ms;
+    --transition-ease: cubic-bezier(.2, .8, .2, 1);
+
+    /* Reels / video specific */
+    --reel-snap-type: y mandatory;
+    --reel-gap: 0;
+    /* gap between reels in px */
+    --reel-overlay-padding: 12px;
+    --reel-overlay-bg: rgba(0, 0, 0, 0.35);
+    --reel-desc-max-lines: 1;
+    /* used with line-clamp in component CSS */
+    --visit-btn-bg: rgba(255, 255, 255, 0.95);
+    --visit-btn-color: #111;
+
+    /* Breakpoints */
+    --bp-sm: 540px;
+    --bp-md: 768px;
+    --bp-lg: 1024px;
+}
+
+/* Utility helper: single-line truncation using the variable above */
+.truncate-single-line {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Optional utility: multi-line clamp (requires -webkit- prefix support) */
+.clamp-lines-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Basic app-level body styles that use the variables */
+body {
+    margin: 0;
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    color: var(--color-text);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
