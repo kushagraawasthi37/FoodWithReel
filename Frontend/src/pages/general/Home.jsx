@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance"; // use axiosInstance
 import { Link, useNavigate } from "react-router-dom";
 import {
   AiFillHeart,
@@ -11,8 +11,6 @@ import {
 } from "react-icons/ai";
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import "../../styles/reels.css";
-
-const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function Home() {
   const [videos, setVideos] = useState([]);
@@ -28,23 +26,18 @@ export default function Home() {
 
   const navigate = useNavigate();
 
-  // Fetch current user using Bearer token
+  // Fetch current user
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    axios
-      .get(`${BACKEND_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    axiosInstance
+      .get("/api/auth/me")
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
 
   // Fetch videos
   useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/api/food/foodItems`)
+    axiosInstance
+      .get("/api/food/foodItems")
       .then((res) => {
         const data = res.data.foodItems || [];
         const likes = {};
@@ -97,11 +90,6 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [popupMessage]);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   // Like toggle
   const toggleLike = async (id) => {
     if (!user) return setPopupMessage("Please login to like");
@@ -113,11 +101,7 @@ export default function Home() {
     }));
 
     try {
-      const res = await axios.post(
-        `${BACKEND_URL}/api/food/like`,
-        { foodId: id },
-        { headers: getAuthHeaders() }
-      );
+      const res = await axiosInstance.post("/api/food/like", { foodId: id });
       setLikedVideos((prev) => ({ ...prev, [id]: res.data.liked }));
       setLikesCount((prev) => ({ ...prev, [id]: res.data.likes }));
     } catch (err) {
@@ -136,11 +120,7 @@ export default function Home() {
     }));
 
     try {
-      const res = await axios.post(
-        `${BACKEND_URL}/api/food/save`,
-        { foodId: id },
-        { headers: getAuthHeaders() }
-      );
+      const res = await axiosInstance.post("/api/food/save", { foodId: id });
       setSavedVideos((prev) => ({ ...prev, [id]: res.data.saved }));
       setSavesCount((prev) => ({ ...prev, [id]: res.data.saves }));
     } catch (err) {
@@ -150,7 +130,7 @@ export default function Home() {
 
   const logoutUser = async () => {
     try {
-      await axios.post(`${BACKEND_URL}/api/auth/logout`, {}, { headers: getAuthHeaders() });
+      await axiosInstance.post("/api/auth/logout");
     } catch (err) {
       console.error(err);
     }

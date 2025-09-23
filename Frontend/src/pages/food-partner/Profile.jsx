@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance"; // use custom axios instance
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/ProfileUI.css";
-
-// <-- Replace with your deployed backend URL -->
-const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 function ProfileUI() {
   const { id } = useParams();
@@ -18,17 +15,8 @@ function ProfileUI() {
   // Fetch profile and videos
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem("token"); // Bearer token
-      if (!token) {
-        console.error("User not authenticated");
-        setLoading(false);
-        return;
-      }
-
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/food-partner/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axiosInstance.get(`/api/food-partner/${id}`);
         const foodPartner = res.data.foodPartner;
         setProfile(foodPartner);
         setVideos(foodPartner.foodItems || []);

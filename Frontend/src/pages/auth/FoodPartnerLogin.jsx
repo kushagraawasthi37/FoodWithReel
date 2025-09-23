@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-
-// Replace with your deployed backend URL
-const BACKEND_URL = import.meta.env.VITE_API_URL;
+import axiosInstance from "../utils/axiosInstance"; // updated import
 
 export default function FoodPartnerLogin() {
   const [email, setEmail] = useState("");
@@ -14,12 +11,12 @@ export default function FoodPartnerLogin() {
   async function onSubmit(e) {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${BACKEND_URL}/api/auth/food-partner/login`,
-        { email, password }
-      );
+      const response = await axiosInstance.post("/api/auth/food-partner/login", {
+        email,
+        password,
+      });
 
-      // Save JWT token in localStorage for Bearer auth
+      // Save JWT token in localStorage (axiosInstance will now use it automatically)
       localStorage.setItem("token", response.data.token);
 
       console.log(response.data);

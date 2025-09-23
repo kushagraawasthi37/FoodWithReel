@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance"; // use custom axios instance
 import "../../styles/OwnerVideoPage.css";
-
-// <-- Replace with your deployed backend URL -->
-const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function OwnerVideoPage() {
   const { ownerId } = useParams();
@@ -16,20 +13,8 @@ export default function OwnerVideoPage() {
 
   useEffect(() => {
     const fetchOwnerVideos = async () => {
-      const token = localStorage.getItem("token"); // Bearer token
-      if (!token) {
-        setLoading(false);
-        console.error("User not authenticated");
-        return;
-      }
-
       try {
-        const res = await axios.get(
-          `${BACKEND_URL}/api/food/owner-food/${ownerId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await axiosInstance.get(`/api/food/owner-food/${ownerId}`);
         setVideos(res.data.foodItems || []);
       } catch (err) {
         console.error("Error fetching owner videos:", err);

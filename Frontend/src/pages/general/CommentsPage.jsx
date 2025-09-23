@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance"; // use custom axios instance
 import { FiMoreVertical } from "react-icons/fi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/comment.css";
-
-const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function CommentsPage() {
   const { foodId } = useParams();
@@ -23,13 +21,8 @@ export default function CommentsPage() {
   }, []);
 
   const fetchUser = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return setUser(null);
-
     try {
-      const res = await axios.get(`${BACKEND_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axiosInstance.get("/api/auth/me");
       setUser(res.data.user);
     } catch {
       setUser(null);
@@ -38,7 +31,7 @@ export default function CommentsPage() {
 
   const fetchComments = async () => {
     try {
-      const res = await axios.get(`${BACKEND_URL}/api/food/${foodId}/comments`);
+      const res = await axiosInstance.get(`/api/food/${foodId}/comments`);
       setComments(res.data.comments);
     } catch (err) {
       console.error("Failed to fetch comments", err);
@@ -49,16 +42,13 @@ export default function CommentsPage() {
     if (!user) return alert("Login to post comment");
     if (!newComment.trim()) return;
 
-    const token = localStorage.getItem("token");
-    if (!token) return alert("Login to post comment");
-
-    await axios.post(
-      `${BACKEND_URL}/api/food/comment`,
-      { foodId, content: newComment },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setNewComment("");
-    fetchComments();
+    try {
+      await axiosInstance.post("/api/food/comment", { foodId, content: newComment });
+      setNewComment("");
+      fetchComments();
+    } catch (err) {
+      console.error("Failed to post comment", err);
+    }
   };
 
   const startEdit = (id, content) => {
@@ -74,28 +64,26 @@ export default function CommentsPage() {
 
   const saveEdit = async (id) => {
     if (!editingContent.trim()) return;
-    const token = localStorage.getItem("token");
-    if (!token) return alert("Login to edit comment");
 
-    await axios.put(
-      `${BACKEND_URL}/api/food/comment/${id}`,
-      { content: editingContent },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setEditingId(null);
-    setEditingContent("");
-    fetchComments();
+    try {
+      await axiosInstance.put(`/api/food/comment/${id}`, { content: editingContent });
+      setEditingId(null);
+      setEditingContent("");
+      fetchComments();
+    } catch (err) {
+      console.error("Failed to edit comment", err);
+    }
   };
 
   const deleteComment = async (id) => {
     if (!window.confirm("Are you sure you want to delete this comment?")) return;
-    const token = localStorage.getItem("token");
-    if (!token) return alert("Login to delete comment");
 
-    await axios.delete(`${BACKEND_URL}/api/food/comment/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    fetchComments();
+    try {
+      await axiosInstance.delete(`/api/food/comment/${id}`);
+      fetchComments();
+    } catch (err) {
+      console.error("Failed to delete comment", err);
+    }
   };
 
   const toggleActions = (id) => {

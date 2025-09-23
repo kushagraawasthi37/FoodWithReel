@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-
-// Replace this with your deployed backend URL
-const BACKEND_URL = import.meta.env.VITE_API_URL;
+import axiosInstance from "../utils/axiosInstance"; // use custom axios instance
 
 export default function UserRegister() {
   const navigate = useNavigate();
@@ -15,14 +12,15 @@ export default function UserRegister() {
   async function onSubmit(e) {
     e.preventDefault();
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/auth/user/register`, {
+      const response = await axiosInstance.post("/api/auth/user/register", {
         fullName,
         email,
         password,
       });
 
-      // Store JWT in localStorage
+      // Store JWT in localStorage (axiosInstance will use it automatically for future requests)
       localStorage.setItem("token", response.data.token);
+
       console.log(response.data);
       navigate("/"); // Redirect after successful registration
     } catch (err) {

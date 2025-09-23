@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance"; // Use axiosInstance
 import {
   AiOutlineComment,
   AiFillHeart,
@@ -13,8 +13,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaRegSadCry } from "react-icons/fa";
 import "../../styles/reels.css";
 
-const BACKEND_URL = import.meta.env.VITE_API_URL;
-
 export default function Saved() {
   const [savedVideos, setSavedVideos] = useState([]);
   const [likedVideos, setLikedVideos] = useState({});
@@ -23,18 +21,10 @@ export default function Saved() {
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   // Fetch current user
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    axios
-      .get(`${BACKEND_URL}/api/auth/me`, { headers: getAuthHeaders() })
+    axiosInstance
+      .get("/api/auth/me")
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
@@ -43,24 +33,24 @@ export default function Saved() {
   useEffect(() => {
     if (!user) return;
 
-    axios
-      .get(`${BACKEND_URL}/api/food/save`, { headers: getAuthHeaders() })
+    axiosInstance
+      .get("/api/food/save")
       .then((res) => {
         const saved = res.data.savedVideos || [];
-        const liked = {};
+        const likedMap = {};
         const savedMap = {};
         saved.forEach((v) => {
-          if (v.likedByMe) liked[v._id] = true;
+          if (v.likedByMe) likedMap[v._id] = true;
           savedMap[v._id] = true;
         });
         setSavedVideos(saved);
-        setLikedVideos(liked);
+        setLikedVideos(likedMap);
         setSavedState(savedMap);
       })
       .catch((err) => console.error(err));
   }, [user]);
 
-  // IntersectionObserver for autoplay
+  // Autoplay videos
   useEffect(() => {
     if (!savedVideos.length) return;
 
@@ -77,24 +67,16 @@ export default function Saved() {
 
     const nodes = containerRef.current?.querySelectorAll(".reel");
     nodes?.forEach((n) => observer.observe(n));
-
     return () => observer.disconnect();
   }, [savedVideos]);
 
-  // Like toggle
   const toggleLike = async (id) => {
     if (!user) return navigate("/user/login");
-
     const currentlyLiked = likedVideos[id];
     setLikedVideos((prev) => ({ ...prev, [id]: !currentlyLiked }));
 
     try {
-      const res = await axios.post(
-        `${BACKEND_URL}/api/food/like`,
-        { foodId: id },
-        { headers: getAuthHeaders() }
-      );
-
+      const res = await axiosInstance.post("/api/food/like", { foodId: id });
       setLikedVideos((prev) => ({ ...prev, [id]: res.data.liked }));
       setSavedVideos((prev) =>
         prev.map((v) =>
@@ -106,29 +88,22 @@ export default function Saved() {
     }
   };
 
-  // Save/Unsave toggle
   const toggleSave = async (id) => {
     if (!user) return navigate("/user/login");
-
     const currentlySaved = savedState[id];
     setSavedState((prev) => ({ ...prev, [id]: !currentlySaved }));
     setSavedVideos((prev) => prev.filter((v) => v._id !== id));
 
     try {
-      await axios.post(
-        `${BACKEND_URL}/api/food/save`,
-        { foodId: id },
-        { headers: getAuthHeaders() }
-      );
+      await axiosInstance.post("/api/food/save", { foodId: id });
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Logout
   const handleLogout = async () => {
     try {
-      await axios.post(`${BACKEND_URL}/api/auth/logout`, {}, { headers: getAuthHeaders() });
+      await axiosInstance.post("/api/auth/logout");
     } catch (err) {
       console.error(err);
     }
@@ -138,7 +113,6 @@ export default function Saved() {
   };
 
   const goToComments = (foodId) => navigate(`/food/${foodId}/comments`);
-
   const noSaved = savedVideos.length === 0;
 
   return (
@@ -155,7 +129,6 @@ export default function Saved() {
           savedVideos.map((v) => (
             <div key={v._id} className="reel">
               <video src={v.video} muted playsInline loop />
-
               <div className="overlay">
                 <div className="title-pill">{v.name}</div>
                 <div className="desc">{v.description}</div>
@@ -165,7 +138,6 @@ export default function Saved() {
                   </Link>
                 )}
               </div>
-
               <div className="video-actions-vertical">
                 <div className="action-block">
                   <button onClick={() => toggleLike(v._id)}>
@@ -177,7 +149,6 @@ export default function Saved() {
                   </button>
                   <span className="count">{v.likeCount ?? 0}</span>
                 </div>
-
                 <div className="action-block">
                   <button onClick={() => toggleSave(v._id)}>
                     {savedState[v._id] ? (
@@ -188,7 +159,6 @@ export default function Saved() {
                   </button>
                   <span className="count">{v.saveCount ?? 0}</span>
                 </div>
-
                 <div className="action-block">
                   <button onClick={() => goToComments(v._id)}>
                     <AiOutlineComment size={28} color="#fff" />

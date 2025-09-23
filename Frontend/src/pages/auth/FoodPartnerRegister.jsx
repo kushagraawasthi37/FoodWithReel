@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-
-// Replace with your deployed backend URL
-const BACKEND_URL = import.meta.env.VITE_API_URL;
+import axiosInstance from "../utils/axiosInstance"; // use the custom instance
 
 export default function FoodPartnerRegister() {
   const navigate = useNavigate();
@@ -28,15 +25,15 @@ export default function FoodPartnerRegister() {
       formData.append("Address", Address);
       if (avatar) formData.append("avatar", avatar);
 
-      const res = await axios.post(
-        `${BACKEND_URL}/api/auth/food-partner/register`,
+      const res = await axiosInstance.post(
+        "/api/auth/food-partner/register",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
 
-      // Save JWT to localStorage for Bearer auth
+      // Save JWT to localStorage (axiosInstance will use it automatically for future requests)
       localStorage.setItem("token", res.data.token);
 
       console.log(res.data);

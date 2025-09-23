@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance"; // use custom axios instance
 import "../../styles/CreateFood.css";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-
-// <-- Replace with your deployed backend URL -->
-const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 export default function CreateFood() {
   const [name, setName] = useState("");
@@ -40,17 +37,8 @@ export default function CreateFood() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token"); // Bearer token from login
-      if (!token) {
-        setMessage("You must be logged in as a food partner.");
-        return;
-      }
-
-      const res = await axios.post(`${BACKEND_URL}/api/food`, formData, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
+      const res = await axiosInstance.post("/api/food", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       console.log(res.data);
