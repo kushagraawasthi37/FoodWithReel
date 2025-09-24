@@ -17,8 +17,8 @@ function ProfileUI() {
     const fetchProfile = async () => {
       try {
         const res = await axiosInstance.get(
-          `/api/food-partner/${id}`,
-          { withCredentials: true }
+          `/api/food-partner/${id}`
+          // { withCredentials: true }
         );
         const foodPartner = res.data.foodPartner;
         setProfile(foodPartner);

@@ -17,7 +17,7 @@ export default function Saved() {
   // Check auth
   useEffect(() => {
     axiosInstance
-      .get("/api/auth/me", { withCredentials: true })
+      .get("/api/auth/me")
       .then(res => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
@@ -25,7 +25,7 @@ export default function Saved() {
   // Fetch saved videos
   useEffect(() => {
     axiosInstance
-      .get("/api/food/save", { withCredentials: true })
+      .get("/api/food/save")
       .then(res => {
         const saved = res.data.savedVideos || [];
         const liked = {};
@@ -72,8 +72,7 @@ export default function Saved() {
     try {
       const res = await axiosInstance.post(
         "/api/food/like",
-        { foodId: id },
-        { withCredentials: true }
+        { foodId: id }
       );
 
       // Update UI based on backend response
@@ -99,8 +98,8 @@ export default function Saved() {
     try {
       await axiosInstance.post(
         "/api/food/save",
-        { foodId: id },
-        { withCredentials: true }
+        { foodId: id }
+        // { withCredentials: true }
       );
     } catch (err) {
       console.error(err);
@@ -108,15 +107,17 @@ export default function Saved() {
   };
 
   // Logout
-  const handleLogout = async () => {
-    try {
-      await axiosInstance.post("/api/auth/logout", {}, { withCredentials: true });
-    } catch (err) {
-      console.error(err);
-    }
-    setUser(null);
-    navigate("/user/login");
-  };
+const handleLogout = async () => {
+  try {
+    await axiosInstance.post("/api/auth/logout");  // no withCredentials
+  } catch (err) {
+    console.error(err);
+  }
+  // Remove JWT token from localStorage on logout
+  localStorage.removeItem("token");
+  setUser(null);
+  navigate("/user/login");
+};
 
   // Go to comments
   const goToComments = foodId => navigate(`/food/${foodId}/comments`);

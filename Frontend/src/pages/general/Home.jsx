@@ -29,7 +29,7 @@ export default function Home() {
   // Fetch current user
   useEffect(() => {
     axiosInstance
-      .get("/api/auth/me", { withCredentials: true })
+      .get("/api/auth/me") // removed withCredentials
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
@@ -37,7 +37,7 @@ export default function Home() {
   // Fetch videos
   useEffect(() => {
     axiosInstance
-      .get("/api/food/foodItems", { withCredentials: true })
+      .get("/api/food/foodItems") // removed withCredentials
       .then((res) => {
         const data = res.data.foodItems || [];
         const likes = {};
@@ -103,8 +103,8 @@ export default function Home() {
     try {
       const res = await axiosInstance.post(
         "/api/food/like",
-        { foodId: id },
-        { withCredentials: true }
+        { foodId: id }
+        // { withCredentials: true }
       );
       setLikedVideos((prev) => ({ ...prev, [id]: res.data.liked }));
       setLikesCount((prev) => ({ ...prev, [id]: res.data.likes }));
@@ -126,8 +126,8 @@ export default function Home() {
     try {
       const res = await axiosInstance.post(
         "/api/food/save",
-        { foodId: id },
-        { withCredentials: true }
+        { foodId: id }
+        // { withCredentials: true }
       );
       setSavedVideos((prev) => ({ ...prev, [id]: res.data.saved }));
       setSavesCount((prev) => ({ ...prev, [id]: res.data.saves }));
@@ -136,15 +136,18 @@ export default function Home() {
     }
   };
 
-  const logoutUser = async () => {
-    try {
-      await axiosInstance.post("/api/auth/logout", {}, { withCredentials: true });
-    } catch (err) {
-      console.error(err);
-    }
-    setUser(null);
-    navigate("/");
-  };
+const logoutUser = async () => {
+  try {
+    // Optional: call backend logout if needed
+    await axiosInstance.post("/api/auth/logout"); // no withCredentials
+  } catch (err) {
+    console.error(err);
+  }
+  // Remove token from localStorage to log out on client
+  localStorage.removeItem("token");
+  setUser(null);
+  navigate("/user/login");
+};
 
   const goToComments = (foodId) => navigate(`/food/${foodId}/comments`);
 

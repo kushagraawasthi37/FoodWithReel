@@ -22,7 +22,7 @@ export default function CommentsPage() {
 
   const fetchUser = () => {
     axiosInstance
-      .get("/api/auth/me", { withCredentials: true })
+      .get("/api/auth/me")// removed withCredentials
       .then(res => setUser(res.data.user))
       .catch(() => setUser(null));
   };
@@ -38,17 +38,14 @@ export default function CommentsPage() {
     }
   };
 
-  const postComment = async () => {
-    if (!user) return alert("Login to post comment");
-    if (!newComment.trim()) return;
-    await axiosInstance.post(
-      "/api/food/comment",
-      { foodId, content: newComment },
-      { withCredentials: true }
-    );
-    setNewComment("");
-    fetchComments();
-  };
+const postComment = async () => {
+  if (!user) return alert("Login to post comment");
+  if (!newComment.trim()) return;
+  await axiosInstance.post("/api/food/comment", { foodId, content: newComment });
+  setNewComment("");
+  fetchComments();
+};
+
 
   const startEdit = (id, content) => {
     setEditingId(id);
@@ -61,26 +58,19 @@ export default function CommentsPage() {
     setEditingContent("");
   };
 
-  const saveEdit = async id => {
-    if (!editingContent.trim()) return;
-    await axiosInstance.put(
-      `/api/food/comment/${id}`,
-      { content: editingContent },
-      { withCredentials: true }
-    );
-    setEditingId(null);
-    setEditingContent("");
-    fetchComments();
-  };
+const saveEdit = async id => {
+  if (!editingContent.trim()) return;
+  await axiosInstance.put(`/api/food/comment/${id}`, { content: editingContent });
+  setEditingId(null);
+  setEditingContent("");
+  fetchComments();
+};
 
-  const deleteComment = async id => {
-    if (!window.confirm("Are you sure you want to delete this comment?")) return;
-    await axiosInstance.delete(
-      `/api/food/comment/${id}`,
-      { withCredentials: true }
-    );
-    fetchComments();
-  };
+const deleteComment = async id => {
+  if (!window.confirm("Are you sure you want to delete this comment?")) return;
+  await axiosInstance.delete(`/api/food/comment/${id}`);
+  fetchComments();
+};
 
   const toggleActions = id => {
     setShowActionsId(prev => (prev === id ? null : id));

@@ -10,7 +10,7 @@ const router = express.Router();
 // User Auth
 router.post("/user/register", authController.registerUser);
 router.post("/user/login", authController.loginUser);
-router.get(
+router.post(
   "/user/logout",
   authMiddleware.authUserMiddleware,
   authController.logoutUser
@@ -23,7 +23,7 @@ router.post(
   authController.registerFoodPartner
 );
 router.post("/food-partner/login", authController.loginFoodPartner);
-router.get(
+router.post(
   "/food-partner/logout",
   authMiddleware.authFoodpartnerMiddleware,
   authController.logoutFoodPartner

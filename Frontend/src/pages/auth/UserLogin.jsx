@@ -14,7 +14,17 @@ export default function UserLogin(){
     try {
       const response = await axiosInstance.post("/api/auth/user/login", {
         email, password
-      }, { withCredentials: true })
+      }
+      // { 
+      //   withCredentials: true//Cokkie ka use nahi kr rhe hai na
+      // }
+    );
+
+    // Save JWT token in localStorage for authentication
+    localStorage.setItem("token", response.data.token);
+    
+    // Optionally store user info if returned
+    // setUser(response.data.user);
 
       console.log(response.data)
       navigate("/") // Redirect to home after login

@@ -15,7 +15,18 @@ export default function UserRegister(){
     try {
       const response = await axiosInstance.post("/api/auth/user/register", {
         fullName, email, password
-      }, { withCredentials:true })
+      }
+      //  { withCredentials:true }//Cookie use nhi kar rhe ye cookie ko aage send krta hai
+      )
+
+
+      // Save JWT token after registration
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+    }
+
+    // Optionally store user info if returned
+    // setUser(response.data.user);
 
       console.log(response.data)
       navigate('/')

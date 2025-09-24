@@ -27,9 +27,18 @@ export default function FoodPartnerRegister(){
       if (avatar) formData.append("avatar", avatar)
 
       const res = await axiosInstance.post("/api/auth/food-partner/register", formData, {
-        withCredentials: true,
+        // withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" }
       })
+
+    // Save JWT token from registration response in localStorage for Option 2
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
+    }
+
+    // Optionally store user info here
+    // setUser(res.data.user);
+    
       console.log(res.data)
       navigate("/create-food")
     } catch(err) {

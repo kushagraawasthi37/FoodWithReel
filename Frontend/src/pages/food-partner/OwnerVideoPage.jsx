@@ -15,8 +15,8 @@ export default function OwnerVideoPage() {
     const fetchOwnerVideos = async () => {
       try {
         const res = await axiosInstance.get(
-          `/api/food/owner-food/${ownerId}`,
-          { withCredentials: true }
+          `/api/food/owner-food/${ownerId}`
+          // { withCredentials: true }
         );
         setVideos(res.data.foodItems || []);
       } catch (err) {

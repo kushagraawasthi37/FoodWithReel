@@ -39,7 +39,10 @@ export default function CreateFood() {
       const res = await axiosInstance.post(
         "/api/food",
         formData,
-        { withCredentials: true }
+        {
+        headers: { "Content-Type": "multipart/form-data" }
+        // withCredentials removed for Option 2
+      }
       );
       console.log(res.data);
       navigate("/");

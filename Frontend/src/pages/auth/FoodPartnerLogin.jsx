@@ -1,24 +1,30 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axiosInstance from "../../api/axiosInstance.js"
-import { useNavigate } from 'react-router-dom'
 
-export default function FoodPartnerLogin(){
+export default function FoodPartnerLogin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  async function onSubmit(e){
+  async function onSubmit(e) {
     e.preventDefault()
     try {
       const response = await axiosInstance.post("/api/auth/food-partner/login", {
-        email, password
-      }, { withCredentials:true })
+        email,
+        password,
+      })
+      
+      // Save token in localStorage for Option 2 auth
+      localStorage.setItem("token", response.data.token)
 
-      console.log(response.data)
+      // Optionally, store user info for global state if needed
+      // setUser(response.data.user)
+
+      console.log("Login successful:", response.data)
       navigate("/create-food")
-    } catch(err){
+    } catch (err) {
       const msg = err.response?.data?.message || "Something went wrong"
       setError(msg)
       setTimeout(() => setError(''), 3000)
