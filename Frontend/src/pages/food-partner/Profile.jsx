@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance.js"
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/ProfileUI.css";
 
@@ -16,8 +16,8 @@ function ProfileUI() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:3000/api/food-partner/${id}`,
+        const res = await axiosInstance.get(
+          `/api/food-partner/${id}`,
           { withCredentials: true }
         );
         const foodPartner = res.data.foodPartner;

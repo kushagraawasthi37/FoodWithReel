@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+import axiosInstance from "../../api/axiosInstance.js"
 import { useNavigate } from 'react-router-dom'
 
 export default function FoodPartnerRegister(){
@@ -26,7 +26,7 @@ export default function FoodPartnerRegister(){
       formData.append("Address", Address)
       if (avatar) formData.append("avatar", avatar)
 
-      const res = await axios.post("http://localhost:3000/api/auth/food-partner/register", formData, {
+      const res = await axiosInstance.post("/api/auth/food-partner/register", formData, {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" }
       })

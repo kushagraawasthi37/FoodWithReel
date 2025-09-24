@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance.js"
 import "../../styles/OwnerVideoPage.css";
 
 export default function OwnerVideoPage() {
@@ -14,8 +14,8 @@ export default function OwnerVideoPage() {
   useEffect(() => {
     const fetchOwnerVideos = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:3000/api/food/owner-food/${ownerId}`,
+        const res = await axiosInstance.get(
+          `/api/food/owner-food/${ownerId}`,
           { withCredentials: true }
         );
         setVideos(res.data.foodItems || []);

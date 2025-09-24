@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance.js"
 import { AiOutlineComment, AiFillHeart, AiOutlineHeart, AiOutlineHome, AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,16 +16,16 @@ export default function Saved() {
 
   // Check auth
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/auth/me", { withCredentials: true })
+    axiosInstance
+      .get("/api/auth/me", { withCredentials: true })
       .then(res => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
 
   // Fetch saved videos
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/food/save", { withCredentials: true })
+    axiosInstance
+      .get("/api/food/save", { withCredentials: true })
       .then(res => {
         const saved = res.data.savedVideos || [];
         const liked = {};
@@ -70,8 +70,8 @@ export default function Saved() {
     setLikedVideos(prev => ({ ...prev, [id]: !currentlyLiked }));
 
     try {
-      const res = await axios.post(
-        "http://localhost:3000/api/food/like",
+      const res = await axiosInstance.post(
+        "/api/food/like",
         { foodId: id },
         { withCredentials: true }
       );
@@ -97,8 +97,8 @@ export default function Saved() {
     setSavedVideos(prev => prev.filter(v => v._id !== id)); // remove if unsaved
 
     try {
-      await axios.post(
-        "http://localhost:3000/api/food/save",
+      await axiosInstance.post(
+        "/api/food/save",
         { foodId: id },
         { withCredentials: true }
       );
@@ -110,7 +110,7 @@ export default function Saved() {
   // Logout
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
+      await axiosInstance.post("/api/auth/logout", {}, { withCredentials: true });
     } catch (err) {
       console.error(err);
     }

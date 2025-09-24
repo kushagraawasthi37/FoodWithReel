@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance.js"
 import "../../styles/CreateFood.css";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
@@ -36,8 +36,8 @@ export default function CreateFood() {
 
     setLoading(true);
     try {
-      const res = await axios.post(
-        "http://localhost:3000/api/food",
+      const res = await axiosInstance.post(
+        "/api/food",
         formData,
         { withCredentials: true }
       );

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance.js"
 import { Link, useNavigate } from "react-router-dom";
 import {
   AiFillHeart,
@@ -28,16 +28,16 @@ export default function Home() {
 
   // Fetch current user
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/auth/me", { withCredentials: true })
+    axiosInstance
+      .get("/api/auth/me", { withCredentials: true })
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
 
   // Fetch videos
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/food/foodItems", { withCredentials: true })
+    axiosInstance
+      .get("/api/food/foodItems", { withCredentials: true })
       .then((res) => {
         const data = res.data.foodItems || [];
         const likes = {};
@@ -101,8 +101,8 @@ export default function Home() {
     }));
 
     try {
-      const res = await axios.post(
-        "http://localhost:3000/api/food/like",
+      const res = await axiosInstance.post(
+        "/api/food/like",
         { foodId: id },
         { withCredentials: true }
       );
@@ -124,8 +124,8 @@ export default function Home() {
     }));
 
     try {
-      const res = await axios.post(
-        "http://localhost:3000/api/food/save",
+      const res = await axiosInstance.post(
+        "/api/food/save",
         { foodId: id },
         { withCredentials: true }
       );
@@ -138,7 +138,7 @@ export default function Home() {
 
   const logoutUser = async () => {
     try {
-      await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
+      await axiosInstance.post("/api/auth/logout", {}, { withCredentials: true });
     } catch (err) {
       console.error(err);
     }

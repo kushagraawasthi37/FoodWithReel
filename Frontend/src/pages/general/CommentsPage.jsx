@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../api/axiosInstance.js"
 import { FiMoreVertical } from "react-icons/fi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/comment.css";
@@ -21,16 +21,16 @@ export default function CommentsPage() {
   }, []);
 
   const fetchUser = () => {
-    axios
-      .get("http://localhost:3000/api/auth/me", { withCredentials: true })
+    axiosInstance
+      .get("/api/auth/me", { withCredentials: true })
       .then(res => setUser(res.data.user))
       .catch(() => setUser(null));
   };
 
   const fetchComments = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:3000/api/food/${foodId}/comments`
+      const res = await axiosInstance.get(
+        `/api/food/${foodId}/comments`
       );
       setComments(res.data.comments);
     } catch (err) {
@@ -41,8 +41,8 @@ export default function CommentsPage() {
   const postComment = async () => {
     if (!user) return alert("Login to post comment");
     if (!newComment.trim()) return;
-    await axios.post(
-      "http://localhost:3000/api/food/comment",
+    await axiosInstance.post(
+      "/api/food/comment",
       { foodId, content: newComment },
       { withCredentials: true }
     );
@@ -63,8 +63,8 @@ export default function CommentsPage() {
 
   const saveEdit = async id => {
     if (!editingContent.trim()) return;
-    await axios.put(
-      `http://localhost:3000/api/food/comment/${id}`,
+    await axiosInstance.put(
+      `/api/food/comment/${id}`,
       { content: editingContent },
       { withCredentials: true }
     );
@@ -75,8 +75,8 @@ export default function CommentsPage() {
 
   const deleteComment = async id => {
     if (!window.confirm("Are you sure you want to delete this comment?")) return;
-    await axios.delete(
-      `http://localhost:3000/api/food/comment/${id}`,
+    await axiosInstance.delete(
+      `/api/food/comment/${id}`,
       { withCredentials: true }
     );
     fetchComments();

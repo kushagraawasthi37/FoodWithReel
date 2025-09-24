@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
+import axiosInstance from "../../api/axiosInstance.js"
 import { useNavigate } from 'react-router-dom'
 
 export default function UserLogin(){
@@ -12,7 +12,7 @@ export default function UserLogin(){
   async function onSubmit(e){
     e.preventDefault()
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/user/login", {
+      const response = await axiosInstance.post("/api/auth/user/login", {
         email, password
       }, { withCredentials: true })
 
