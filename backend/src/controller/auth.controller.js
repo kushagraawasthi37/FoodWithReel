@@ -35,7 +35,7 @@ async function registerUser(req, res) {
     }
   );
 
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = true;
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -80,7 +80,7 @@ async function loginUser(req, res) {
     expiresIn: process.env.JWT_EXPIRY_TIME,
   });
 
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = true;
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -154,7 +154,7 @@ async function registerFoodPartner(req, res) {
     }
   );
 
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = true;
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -206,7 +206,7 @@ async function loginFoodPartner(req, res) {
     });
 
     // Set cookie
-    const isProduction = process.env.NODE_ENV === "production";
+    const isProduction =true;
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -235,7 +235,7 @@ async function loginFoodPartner(req, res) {
 async function logoutFoodPartner(req, res) {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "none",
   });
 
