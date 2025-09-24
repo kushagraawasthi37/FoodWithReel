@@ -224,7 +224,7 @@ async function loginFoodPartner(req, res) {
     // Return user data and mark as food-partner
     res.status(200).json({
       message: "Partner login successfully",
-        token,  // send token in response body
+      token, // send token in response body
 
       user: {
         _id: foodpartner._id,
@@ -254,9 +254,14 @@ async function logoutFoodPartner(req, res) {
 
 // Get current logged-in user
 async function getCurrentUser(req, res) {
-  const token = req.cookies?.token;
-  if (!token) return res.status(401).json({ message: "Not logged in" });
+  const authHeader = req.header("Authorization");
+  const token =
+    req.cookies?.token ||
+    (authHeader && authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1].trim()
+      : null);
 
+  if (!token) return res.status(401).json({ message: "Not logged in" });
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
