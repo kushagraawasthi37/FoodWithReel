@@ -252,7 +252,6 @@ async function logoutFoodPartner(req, res) {
   });
 }
 
-// Get current logged-in user
 async function getCurrentUser(req, res) {
   const authHeader = req.header("Authorization");
   const token =
@@ -262,32 +261,26 @@ async function getCurrentUser(req, res) {
       : null);
 
   if (!token) return res.status(401).json({ message: "Not logged in" });
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Check if token belongs to food-partner
-    const foodPartner = await foodPartnerModel
-      .findById(decoded._id)
-      .select("-password");
-
+    // Check if token belongs to food partner
+    const foodPartner = await foodPartnerModel.findById(decoded._id).select("-password");
     if (foodPartner) {
-      return res
-        .status(200)
-        .json({ user: { ...foodPartner.toObject(), isFoodPartner: true } });
+      return res.status(200).json({ user: { ...foodPartner.toObject(), isFoodPartner: true } });
     }
 
-    // Else check normal user
+    // Check for regular user
     const user = await userModel.findById(decoded._id).select("-password");
-
     if (!user) return res.status(401).json({ message: "Not logged in" });
 
-    return res
-      .status(200)
-      .json({ user: { ...user.toObject(), isFoodPartner: false } });
+    return res.status(200).json({ user: { ...user.toObject(), isFoodPartner: false } });
   } catch (err) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
+
 
 module.exports = {
   registerUser,

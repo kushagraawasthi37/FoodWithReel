@@ -10,12 +10,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Create food (protected — only food partners)
 router.post(
   "/",
-  authMiddleware.authFoodpartnerMiddleware,
+  authMiddleware.authAnyUserMiddleware,authMiddleware.requireFoodPartner,
   upload.single("video"),
   foodControllers.createFood
 );
 
-// Get all food items (accessible by logged-in users)
+// Get all food items (accessible by all users)
 router.get(
   "/foodItems",
   // authMiddleware.authUserMiddleware,
@@ -25,34 +25,37 @@ router.get(
 // Like / Save food (user protected)
 router.post(
   "/like",
-  authMiddleware.authUserMiddleware,
+  authMiddleware.authAnyUserMiddleware,
   foodControllers.likeFood
 );
+
 router.post(
   "/save",
-  authMiddleware.authUserMiddleware,
+  authMiddleware.authAnyUserMiddleware,
   foodControllers.saveFood
 );
 router.get(
   "/save",
-  authMiddleware.authUserMiddleware,
+  authMiddleware.authAnyUserMiddleware,
   foodControllers.getSavedVideos
 );
 
 // Comments
 router.get(
   "/:foodId/comments",
-  authMiddleware.authUserMiddleware,
+  // authMiddleware.authAnyUserMiddleware,
   foodControllers.getAllComment
 );
+
 router.post(
   "/comment",
-  authMiddleware.authUserMiddleware,
+  authMiddleware.authAnyUserMiddleware,
   foodControllers.commentFood
 );
+
 router.put(
   "/comment/:id",
-  authMiddleware.authUserMiddleware,
+  authMiddleware.authAnyUserMiddleware,
   foodControllers.updateComment
 );
 router.delete(
@@ -64,7 +67,7 @@ router.delete(
 // Owner foods
 router.get(
   "/owner-food/:ownerId",
-  authMiddleware.authUserMiddleware,
+  // authMiddleware.authAnyUserMiddleware,
   foodControllers.getOwnerFoods
 );
 

@@ -4,10 +4,10 @@ const router = express.Router();
 const foodPartnerControllers = require("../controller/food-partner.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
-// Get food partner profile by ID (protected)
+// Get food partner profile by ID ()
 router.get(
   "/:id",
-  authMiddleware.authUserMiddleware,
+  // authMiddleware.authAnyUserMiddleware,
   foodPartnerControllers.getFoodPartnerProfileById
 );
 

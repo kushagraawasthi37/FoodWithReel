@@ -12,7 +12,7 @@ router.post("/user/register", authController.registerUser);
 router.post("/user/login", authController.loginUser);
 router.post(
   "/user/logout",
-  authMiddleware.authUserMiddleware,
+  authMiddleware.authAnyUserMiddleware,
   authController.logoutUser
 );
 
@@ -25,14 +25,14 @@ router.post(
 router.post("/food-partner/login", authController.loginFoodPartner);
 router.post(
   "/food-partner/logout",
-  authMiddleware.authFoodpartnerMiddleware,
+  authMiddleware.authAnyUserMiddleware,
   authController.logoutFoodPartner
 );
 
 // Current logged-in user
 router.get(
   "/me",
-  authMiddleware.authUserMiddleware,
+  authMiddleware.authAnyUserMiddleware,
   authController.getCurrentUser
 );
 
