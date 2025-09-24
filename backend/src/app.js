@@ -13,7 +13,7 @@ const corsOptions = {
 app.set("trust proxy", 1); // if behind proxy (like on Render)
 
 app.use(cors(corsOptions));
-app.options("/*", cors(corsOptions));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
