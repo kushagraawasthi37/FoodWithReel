@@ -63,11 +63,14 @@ async function getAllFoodItems(req, res) {
 
 async function likeFood(req, res) {
   const { foodId } = req.body;
-  const user = req.user;
+  const user = req.user || req.foodPartner;
 
-  console.log("Like hit");
   if (!foodId) {
     return res.status(400).json({ message: "Food id is required" });
+  }
+
+  if (!user) {
+    return res.status(401).json({ message: "Not authenticated" });
   }
 
   const existingLike = await likeModel.findOne({
@@ -76,7 +79,6 @@ async function likeFood(req, res) {
   });
 
   if (existingLike) {
-    // remove like
     await likeModel.findByIdAndDelete(existingLike._id);
     await foodModel.findByIdAndUpdate(foodId, { $inc: { likeCount: -1 } });
 
@@ -84,7 +86,6 @@ async function likeFood(req, res) {
     return res.status(200).json({ liked: false, likes });
   }
 
-  // add like
   await likeModel.create({ user: user._id, food: foodId });
   await foodModel.findByIdAndUpdate(foodId, { $inc: { likeCount: 1 } });
 
@@ -94,12 +95,14 @@ async function likeFood(req, res) {
 
 async function saveFood(req, res) {
   const { foodId } = req.body;
-  const user = req.user;
-
-  console.log("Save route hit");
+  const user = req.user || req.foodPartner;
 
   if (!foodId) {
     return res.status(400).json({ message: "Food id is required" });
+  }
+
+  if (!user) {
+    return res.status(401).json({ message: "Not authenticated" });
   }
 
   const existingSave = await saveModel.findOne({
@@ -108,7 +111,6 @@ async function saveFood(req, res) {
   });
 
   if (existingSave) {
-    // remove save
     await saveModel.findByIdAndDelete(existingSave._id);
     await foodModel.findByIdAndUpdate(foodId, { $inc: { saveCount: -1 } });
 
@@ -116,7 +118,6 @@ async function saveFood(req, res) {
     return res.status(200).json({ saved: false, saves });
   }
 
-  // add save
   await saveModel.create({ user: user._id, food: foodId });
   await foodModel.findByIdAndUpdate(foodId, { $inc: { saveCount: 1 } });
 
@@ -124,16 +125,17 @@ async function saveFood(req, res) {
   return res.status(201).json({ saved: true, saves });
 }
 
+
 // GET /api/food/save
 const getSavedVideos = async (req, res) => {
   try {
-    const userId = req.user?._id; // Assuming auth middleware sets req.user
+    const userId = req.user?._id || req.foodPartner?._id; // Support both user types
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Find all saved entries for this user and populate food details
+    // Find all saved entries for this user (could be user or food partner)
     const savedEntries = await saveModel
       .find({ user: userId })
       .populate({
@@ -142,7 +144,7 @@ const getSavedVideos = async (req, res) => {
       })
       .lean();
 
-    // Extract food objects from save entries
+    // Extract food objects from saved entries
     const savedVideos = savedEntries
       .map((entry) => entry.food)
       .filter((food) => food != null);
@@ -154,23 +156,26 @@ const getSavedVideos = async (req, res) => {
   }
 };
 
+
 async function commentFood(req, res) {
   const { foodId, content } = req.body;
-  const user = req.user;
-
-  console.log("Comment route hit");
+  const user = req.user || req.foodPartner; // Support either
 
   if (!foodId) {
     return res.status(400).json({ message: "Food id is required" });
   }
 
-  // add comment
+  if (!user) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+
   await commentModel.create({ content, user: user._id, food: foodId });
   await foodModel.findByIdAndUpdate(foodId, { $inc: { commentCount: 1 } });
 
-  const comment = await commentModel.countDocuments({ food: foodId });
-  return res.status(201).json({ comment: true, comment });
+  const commentCount = await commentModel.countDocuments({ food: foodId });
+  return res.status(201).json({ comment: true, commentCount });
 }
+
 
 async function getAllComment(req, res) {
   const { foodId } = req.params; // get foodId from route param
