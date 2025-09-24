@@ -60,7 +60,7 @@ router.put(
 );
 router.delete(
   "/comment/:id",
-  authMiddleware.authUserMiddleware,
+  authMiddleware.authAnyUserMiddleware,
   foodControllers.deleteComment
 );
 
