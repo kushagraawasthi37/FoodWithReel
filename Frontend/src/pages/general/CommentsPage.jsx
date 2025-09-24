@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../../api/axiosInstance.js"
+import axiosInstance from "../../api/axiosInstance.js";
 import { FiMoreVertical } from "react-icons/fi";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/comment.css";
@@ -14,6 +14,7 @@ export default function CommentsPage() {
   const [editingId, setEditingId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
   const [showActionsId, setShowActionsId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchUser();
@@ -22,30 +23,30 @@ export default function CommentsPage() {
 
   const fetchUser = () => {
     axiosInstance
-      .get("/api/auth/me")// removed withCredentials
-      .then(res => setUser(res.data.user))
+      .get("/api/auth/me") // removed withCredentials
+      .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   };
 
   const fetchComments = async () => {
     try {
-      const res = await axiosInstance.get(
-        `/api/food/${foodId}/comments`
-      );
+      setLoading(true);
+      const res = await axiosInstance.get(`/api/food/${foodId}/comments`);
       setComments(res.data.comments);
     } catch (err) {
       console.error("Failed to fetch comments", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-const postComment = async () => {
-  if (!user) return alert("Login to post comment");
-  if (!newComment.trim()) return;
-  await axiosInstance.post("/api/food/comment", { foodId, content: newComment });
-  setNewComment("");
-  fetchComments();
-};
-
+  const postComment = async () => {
+    if (!user) return alert("Login to post comment");
+    if (!newComment.trim()) return;
+    await axiosInstance.post("/api/food/comment", { foodId, content: newComment });
+    setNewComment("");
+    fetchComments();
+  };
 
   const startEdit = (id, content) => {
     setEditingId(id);
@@ -58,25 +59,25 @@ const postComment = async () => {
     setEditingContent("");
   };
 
-const saveEdit = async id => {
-  if (!editingContent.trim()) return;
-  await axiosInstance.put(`/api/food/comment/${id}`, { content: editingContent });
-  setEditingId(null);
-  setEditingContent("");
-  fetchComments();
-};
-
-const deleteComment = async id => {
-  if (!window.confirm("Are you sure you want to delete this comment?")) return;
-  await axiosInstance.delete(`/api/food/comment/${id}`);
-  fetchComments();
-};
-
-  const toggleActions = id => {
-    setShowActionsId(prev => (prev === id ? null : id));
+  const saveEdit = async (id) => {
+    if (!editingContent.trim()) return;
+    await axiosInstance.put(`/api/food/comment/${id}`, { content: editingContent });
+    setEditingId(null);
+    setEditingContent("");
+    fetchComments();
   };
 
-  const timeAgo = timestamp => {
+  const deleteComment = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    await axiosInstance.delete(`/api/food/comment/${id}`);
+    fetchComments();
+  };
+
+  const toggleActions = (id) => {
+    setShowActionsId((prev) => (prev === id ? null : id));
+  };
+
+  const timeAgo = (timestamp) => {
     const now = new Date();
     const commentTime = new Date(timestamp);
     const diff = Math.floor((now - commentTime) / 1000);
@@ -86,15 +87,11 @@ const deleteComment = async id => {
     return `${Math.floor(diff / 86400)}d ago`;
   };
 
-  const renderAvatar = user => {
+  const renderAvatar = (user) => {
     if (user.avatar) {
       return <img src={user.avatar} alt={user.fullName} className="avatar" />;
     }
-    return (
-      <div className="avatar-placeholder">
-        {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
-      </div>
-    );
+    return <div className="avatar-placeholder">{user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}</div>;
   };
 
   return (
@@ -112,58 +109,59 @@ const deleteComment = async id => {
           type="text"
           value={newComment}
           placeholder="Write a comment..."
-          onChange={e => setNewComment(e.target.value)}
+          onChange={(e) => setNewComment(e.target.value)}
         />
         <button onClick={postComment}>Post</button>
       </div>
 
-      <div className="comments-list">
-        {comments.map(c => (
-          <div key={c._id} className="comment">
-            <div className="comment-header">
-              <div className="comment-user-info">
-                {renderAvatar(c.user)}
-                <div>
-                  <span className="user-fullname">
-                    {c.user.fullName || c.user.name || "Unknown User"}
-                  </span>
-                  <div className="timestamp">{timeAgo(c.createdAt)}</div>
+      {loading ? (
+        <div className="loading">Loading comments...</div>
+      ) : comments.length === 0 ? (
+        <p style={{ textAlign: "center", marginTop: "1rem", color: "#666" }}>No comments yet.</p>
+      ) : (
+        <div className="comments-list">
+          {comments.map((c) => (
+            <div key={c._id} className="comment">
+              <div className="comment-header">
+                <div className="comment-user-info">
+                  {renderAvatar(c.user)}
+                  <div>
+                    <span className="user-fullname">{c.user.fullName || c.user.name || "Unknown User"}</span>
+                    <div className="timestamp">{timeAgo(c.createdAt)}</div>
+                  </div>
                 </div>
+
+                {/* Only owner sees the 3 dots */}
+                {user && user._id === c.user._id && (
+                  <div className="comment-actions">
+                    <FiMoreVertical className="more-icon" onClick={() => toggleActions(c._id)} />
+                    {showActionsId === c._id && (
+                      <div className="menu-buttons">
+                        <button onClick={() => startEdit(c._id, c.content)}>Edit</button>
+                        <button onClick={() => deleteComment(c._id)}>Delete</button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Only owner sees the 3 dots */}
-              {user && user._id === c.user._id && (
-                <div className="comment-actions">
-                  <FiMoreVertical
-                    className="more-icon"
-                    onClick={() => toggleActions(c._id)}
+              {editingId === c._id ? (
+                <div className="comment-edit">
+                  <input
+                    type="text"
+                    value={editingContent}
+                    onChange={(e) => setEditingContent(e.target.value)}
                   />
-                  {showActionsId === c._id && (
-                    <div className="menu-buttons">
-                      <button onClick={() => startEdit(c._id, c.content)}>Edit</button>
-                      <button onClick={() => deleteComment(c._id)}>Delete</button>
-                    </div>
-                  )}
+                  <button onClick={() => saveEdit(c._id)}>Save</button>
+                  <button onClick={cancelEdit}>Cancel</button>
                 </div>
+              ) : (
+                <p>{c.content}</p>
               )}
             </div>
-
-            {editingId === c._id ? (
-              <div className="comment-edit">
-                <input
-                  type="text"
-                  value={editingContent}
-                  onChange={e => setEditingContent(e.target.value)}
-                />
-                <button onClick={() => saveEdit(c._id)}>Save</button>
-                <button onClick={cancelEdit}>Cancel</button>
-              </div>
-            ) : (
-              <p>{c.content}</p>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

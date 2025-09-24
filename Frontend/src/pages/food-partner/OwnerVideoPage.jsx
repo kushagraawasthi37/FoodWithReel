@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../../api/axiosInstance.js"
+import axiosInstance from "../../api/axiosInstance.js";
 import "../../styles/OwnerVideoPage.css";
 
 export default function OwnerVideoPage() {
@@ -14,10 +14,7 @@ export default function OwnerVideoPage() {
   useEffect(() => {
     const fetchOwnerVideos = async () => {
       try {
-        const res = await axiosInstance.get(
-          `/api/food/owner-food/${ownerId}`
-          // { withCredentials: true }
-        );
+        const res = await axiosInstance.get(`/api/food/owner-food/${ownerId}`);
         setVideos(res.data.foodItems || []);
       } catch (err) {
         console.error("Error fetching owner videos:", err);
@@ -53,8 +50,13 @@ export default function OwnerVideoPage() {
     };
   }, [videos]);
 
-  if (loading) return <div className="loading">Loading...</div>;
-  if (!videos.length) return <div className="no-videos">No videos found.</div>;
+  if (loading) {
+    return <div className="loading">Loading videos...</div>;
+  }
+
+  if (!loading && videos.length === 0) {
+    return <div className="no-videos">No videos found.</div>;
+  }
 
   return (
     <div className="owner-video-page">

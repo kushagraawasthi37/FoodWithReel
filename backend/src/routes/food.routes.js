@@ -18,7 +18,7 @@ router.post(
 // Get all food items (accessible by logged-in users)
 router.get(
   "/foodItems",
-  authMiddleware.authUserMiddleware,
+  // authMiddleware.authUserMiddleware,
   foodControllers.getAllFoodItems
 );
 

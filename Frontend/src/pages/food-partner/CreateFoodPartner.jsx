@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../api/axiosInstance.js"
+import axiosInstance from "../../api/axiosInstance.js";
 import "../../styles/CreateFood.css";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
@@ -17,8 +17,17 @@ export default function CreateFood() {
   const handleVideoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (!file.type.startsWith("video/")) {
+        setMessage("Please select a valid video file.");
+        return;
+      }
+      if (file.size > 100 * 1024 * 1024) {
+        setMessage("Video file size must be less than 100MB.");
+        return;
+      }
       setVideo(file);
       setPreview(URL.createObjectURL(file));
+      setMessage("");
     }
   };
 
@@ -35,20 +44,16 @@ export default function CreateFood() {
     formData.append("video", video);
 
     setLoading(true);
+    setMessage("");
     try {
-      const res = await axiosInstance.post(
-        "/api/food",
-        formData,
-        {
-        headers: { "Content-Type": "multipart/form-data" }
-        // withCredentials removed for Option 2
-      }
-      );
-      console.log(res.data);
-      navigate("/");
+      const res = await axiosInstance.post("/api/food", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setMessage("Food item created successfully!");
+      navigate("/"); // Redirect to reel/home page after success
     } catch (err) {
       console.error(err);
-      setMessage("Failed to create food");
+      setMessage("Failed to create food. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -57,14 +62,19 @@ export default function CreateFood() {
   return (
     <div className="create-food-container">
       <div className="create-food-card">
-        <AiOutlineArrowLeft className="back-icon" onClick={() => navigate(-1)} />
+        <AiOutlineArrowLeft
+          className="back-icon"
+          onClick={() => navigate("/")} // navigate to reel/home page
+        />
         <h2 className="title">Create New Food Item</h2>
 
         {message && <p className="message">{message}</p>}
 
         <form className="create-food-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Name <span className="required">*</span></label>
+            <label>
+              Name <span className="required">*</span>
+            </label>
             <input
               type="text"
               value={name}
@@ -84,7 +94,9 @@ export default function CreateFood() {
           </div>
 
           <div className="form-group video-upload">
-            <label>Video <span className="required">*</span></label>
+            <label>
+              Video <span className="required">*</span>
+            </label>
             <input
               type="file"
               accept="video/*"

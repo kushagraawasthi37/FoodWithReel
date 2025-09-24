@@ -40,7 +40,7 @@ export default function FoodPartnerRegister(){
     // setUser(res.data.user);
     
       console.log(res.data)
-      navigate("/create-food")
+      navigate("/")
     } catch(err) {
       const msg = err.response?.data?.message || "Something went wrong"
       setError(msg)

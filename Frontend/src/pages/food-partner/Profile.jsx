@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axiosInstance from "../../api/axiosInstance.js"
+import axiosInstance from "../../api/axiosInstance.js";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import "../../styles/ProfileUI.css";
 
 function ProfileUI() {
   const { id } = useParams();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,13 +16,10 @@ function ProfileUI() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axiosInstance.get(
-          `/api/food-partner/${id}`
-          // { withCredentials: true }
-        );
+        const res = await axiosInstance.get(`/api/food-partner/${id}`);
         const foodPartner = res.data.foodPartner;
         setProfile(foodPartner);
-        setVideos(foodPartner.foodItems || []);
+        setVideos(foodPartner?.foodItems || []);
       } catch (error) {
         console.error("Failed to fetch profile:", error);
       } finally {
@@ -55,7 +52,7 @@ function ProfileUI() {
   }, [videos]);
 
   if (loading) return <div className="page">Loading profile...</div>;
-  if (!profile) return <div className="page">Profile not found.</div>;
+  if (!loading && !profile) return <div className="page">Profile not found.</div>;
 
   return (
     <div className="page">
@@ -101,9 +98,7 @@ function ProfileUI() {
             <div
               key={i}
               className="reel-box"
-              onClick={() =>
-                navigate(`/owner-video/${profile._id}/${video._id}`)
-              }
+              onClick={() => navigate(`/owner-video/${profile._id}/${video._id}`)}
             >
               <video
                 ref={(el) => (videoRefs.current[i] = el)}

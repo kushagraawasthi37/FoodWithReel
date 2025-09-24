@@ -1,6 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import axiosInstance from "../../api/axiosInstance.js"
-import { AiOutlineComment, AiFillHeart, AiOutlineHeart, AiOutlineHome, AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
+import React, { useState, useEffect, useRef } from "react";
+import axiosInstance from "../../api/axiosInstance.js";
+import {
+  AiOutlineComment,
+  AiFillHeart,
+  AiOutlineHeart,
+  AiOutlineHome,
+  AiOutlineLogin,
+  AiOutlineLogout,
+} from "react-icons/ai";
 import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { FaRegSadCry } from "react-icons/fa";
@@ -11,34 +18,37 @@ export default function Saved() {
   const [likedVideos, setLikedVideos] = useState({});
   const [savedState, setSavedState] = useState({});
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
-  // Check auth
+  // Check auth and fetch saved videos on mount
   useEffect(() => {
-    axiosInstance
-      .get("/api/auth/me")
-      .then(res => setUser(res.data.user))
-      .catch(() => setUser(null));
-  }, []);
+    const fetchData = async () => {
+      try {
+        const resUser = await axiosInstance.get("/api/auth/me");
+        setUser(resUser.data.user);
 
-  // Fetch saved videos
-  useEffect(() => {
-    axiosInstance
-      .get("/api/food/save")
-      .then(res => {
-        const saved = res.data.savedVideos || [];
+        const resSaved = await axiosInstance.get("/api/food/save");
+        const saved = resSaved.data.savedVideos || [];
         const liked = {};
         const savedMap = {};
-        saved.forEach(v => {
+
+        saved.forEach((v) => {
           if (v.likedByMe) liked[v._id] = true;
           savedMap[v._id] = true;
         });
+
         setSavedVideos(saved);
         setLikedVideos(liked);
         setSavedState(savedMap);
-      })
-      .catch(err => console.error(err));
+      } catch (err) {
+        console.error("Failed fetching data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   // IntersectionObserver for auto-play
@@ -46,8 +56,8 @@ export default function Saved() {
     if (!savedVideos.length) return;
 
     const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
+      (entries) => {
+        entries.forEach((entry) => {
           const video = entry.target.querySelector("video");
           if (!video) return;
           entry.isIntersecting ? video.play().catch(() => {}) : video.pause();
@@ -57,30 +67,23 @@ export default function Saved() {
     );
 
     const nodes = containerRef.current?.querySelectorAll(".reel");
-    nodes?.forEach(n => observer.observe(n));
+    nodes?.forEach((n) => observer.observe(n));
 
     return () => observer.disconnect();
   }, [savedVideos]);
 
   // Like toggle
-  const toggleLike = async id => {
+  const toggleLike = async (id) => {
     if (!user) return navigate("/user/login");
 
     const currentlyLiked = likedVideos[id];
-    setLikedVideos(prev => ({ ...prev, [id]: !currentlyLiked }));
+    setLikedVideos((prev) => ({ ...prev, [id]: !currentlyLiked }));
 
     try {
-      const res = await axiosInstance.post(
-        "/api/food/like",
-        { foodId: id }
-      );
-
-      // Update UI based on backend response
-      setLikedVideos(prev => ({ ...prev, [id]: res.data.liked }));
-      setSavedVideos(prev =>
-        prev.map(v =>
-          v._id === id ? { ...v, likeCount: res.data.likes } : v
-        )
+      const res = await axiosInstance.post("/api/food/like", { foodId: id });
+      setLikedVideos((prev) => ({ ...prev, [id]: res.data.liked }));
+      setSavedVideos((prev) =>
+        prev.map((v) => (v._id === id ? { ...v, likeCount: res.data.likes } : v))
       );
     } catch (err) {
       console.error(err);
@@ -88,54 +91,57 @@ export default function Saved() {
   };
 
   // Save/Unsave toggle
-  const toggleSave = async id => {
+  const toggleSave = async (id) => {
     if (!user) return navigate("/user/login");
 
     const currentlySaved = savedState[id];
-    setSavedState(prev => ({ ...prev, [id]: !currentlySaved }));
-    setSavedVideos(prev => prev.filter(v => v._id !== id)); // remove if unsaved
+    setSavedState((prev) => ({ ...prev, [id]: !currentlySaved }));
+    setSavedVideos((prev) => prev.filter((v) => v._id !== id)); // remove if unsaved
 
     try {
-      await axiosInstance.post(
-        "/api/food/save",
-        { foodId: id }
-        // { withCredentials: true }
-      );
+      await axiosInstance.post("/api/food/save", { foodId: id });
     } catch (err) {
       console.error(err);
     }
   };
 
   // Logout
-const handleLogout = async () => {
-  try {
-    await axiosInstance.post("/api/auth/logout");  // no withCredentials
-  } catch (err) {
-    console.error(err);
-  }
-  // Remove JWT token from localStorage on logout
-  localStorage.removeItem("token");
-  setUser(null);
-  navigate("/user/login");
-};
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.post("/api/auth/logout"); // no withCredentials
+    } catch (err) {
+      console.error(err);
+    }
+    // Remove JWT token from localStorage on logout
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/user/login");
+  };
 
-  // Go to comments
-  const goToComments = foodId => navigate(`/food/${foodId}/comments`);
+  // Go to comments page
+  const goToComments = (foodId) => navigate(`/food/${foodId}/comments`);
 
   const noSaved = savedVideos.length === 0;
 
   return (
     <>
-      <div ref={containerRef} className="reels-container">
-        {noSaved ? (
-          <div className="no-saved improved">
-            <FaRegSadCry size={60} color="#888" />
-            <p>No saved videos yet</p>
-            <small>Save your favorite videos and they’ll appear here!</small>
-            <button onClick={() => navigate("/")}>Browse Home</button>
-          </div>
-        ) : (
-          savedVideos.map(v => (
+      {loading ? (
+        <div className="loading" style={{ textAlign: "center", padding: "2rem", color: "#666" }}>
+          Loading saved videos...
+        </div>
+      ) : noSaved ? (
+        <div className="no-saved improved" style={{ textAlign: "center", padding: "2rem" }}>
+          <FaRegSadCry size={60} color="#888" />
+          <p>No saved videos yet</p>
+          <small>Save your favorite videos and they’ll appear here!</small>
+          <br />
+          <button onClick={() => navigate("/")} style={{ marginTop: "1rem" }}>
+            Browse Home
+          </button>
+        </div>
+      ) : (
+        <div ref={containerRef} className="reels-container">
+          {savedVideos.map((v) => (
             <div key={v._id} className="reel">
               <video src={v.video} muted playsInline loop />
 
@@ -180,12 +186,12 @@ const handleLogout = async () => {
                 </div>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Bottom navigation */}
-      {!noSaved && (
+      {!loading && !noSaved && (
         <div className="bottom-nav">
           <button onClick={() => navigate("/")} className="nav-btn">
             <AiOutlineHome />

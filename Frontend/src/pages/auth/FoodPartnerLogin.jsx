@@ -23,7 +23,7 @@ export default function FoodPartnerLogin() {
       // setUser(response.data.user)
 
       console.log("Login successful:", response.data)
-      navigate("/create-food")
+      navigate("/")
     } catch (err) {
       const msg = err.response?.data?.message || "Something went wrong"
       setError(msg)

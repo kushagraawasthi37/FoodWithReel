@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import axiosInstance from "../../api/axiosInstance.js"
+import axiosInstance from "../../api/axiosInstance.js";
 import { Link, useNavigate } from "react-router-dom";
 import {
   AiFillHeart,
@@ -23,22 +23,24 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [popupMessage, setPopupMessage] = useState("");
   const [activeTab, setActiveTab] = useState("home");
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
   // Fetch current user
   useEffect(() => {
     axiosInstance
-      .get("/api/auth/me") // removed withCredentials
+      .get("/api/auth/me")
       .then((res) => setUser(res.data.user))
       .catch(() => setUser(null));
   }, []);
 
   // Fetch videos
   useEffect(() => {
-    axiosInstance
-      .get("/api/food/foodItems") // removed withCredentials
-      .then((res) => {
+    const fetchVideos = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance.get("/api/food/foodItems");
         const data = res.data.foodItems || [];
         const likes = {};
         const saves = {};
@@ -60,8 +62,13 @@ export default function Home() {
         setCommentsCount(comments);
         setLikedVideos(liked);
         setSavedVideos(saved);
-      })
-      .catch((err) => console.error(err));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVideos();
   }, []);
 
   // Autoplay videos
@@ -101,11 +108,7 @@ export default function Home() {
     }));
 
     try {
-      const res = await axiosInstance.post(
-        "/api/food/like",
-        { foodId: id }
-        // { withCredentials: true }
-      );
+      const res = await axiosInstance.post("/api/food/like", { foodId: id });
       setLikedVideos((prev) => ({ ...prev, [id]: res.data.liked }));
       setLikesCount((prev) => ({ ...prev, [id]: res.data.likes }));
     } catch (err) {
@@ -124,11 +127,7 @@ export default function Home() {
     }));
 
     try {
-      const res = await axiosInstance.post(
-        "/api/food/save",
-        { foodId: id }
-        // { withCredentials: true }
-      );
+      const res = await axiosInstance.post("/api/food/save", { foodId: id });
       setSavedVideos((prev) => ({ ...prev, [id]: res.data.saved }));
       setSavesCount((prev) => ({ ...prev, [id]: res.data.saves }));
     } catch (err) {
@@ -136,18 +135,16 @@ export default function Home() {
     }
   };
 
-const logoutUser = async () => {
-  try {
-    // Optional: call backend logout if needed
-    await axiosInstance.post("/api/auth/logout"); // no withCredentials
-  } catch (err) {
-    console.error(err);
-  }
-  // Remove token from localStorage to log out on client
-  localStorage.removeItem("token");
-  setUser(null);
-  navigate("/user/login");
-};
+  const logoutUser = async () => {
+    try {
+      await axiosInstance.post("/api/auth/logout");
+    } catch (err) {
+      console.error(err);
+    }
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/user/login");
+  };
 
   const goToComments = (foodId) => navigate(`/food/${foodId}/comments`);
 
@@ -156,10 +153,13 @@ const logoutUser = async () => {
 
   return (
     <>
-      {/* Videos */}
-      <div ref={containerRef} className="reels-container">
-        {displayedVideos.length ? (
-          displayedVideos.map((v) => (
+      {loading ? (
+        <div style={{ textAlign: "center", marginTop: "2rem", color: "#777" }}>
+          Loading videos...
+        </div>
+      ) : displayedVideos.length ? (
+        <div ref={containerRef} className="reels-container">
+          {displayedVideos.map((v) => (
             <div key={v._id} className="reel">
               <video src={v.video} muted playsInline loop />
 
@@ -204,26 +204,27 @@ const logoutUser = async () => {
                 </div>
               </div>
             </div>
-          ))
-        ) : (
-          <p style={{ textAlign: "center", color: "#ccc", width: "100%" }}>
-            No videos available.
-          </p>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p style={{ textAlign: "center", color: "#ccc", width: "100%", marginTop: "2rem" }}>
+          No videos available.
+        </p>
+      )}
 
-      {/* Popup */}
       {popupMessage && (
         <div className="popup">
           <p>{popupMessage}</p>
         </div>
       )}
 
-      {/* Bottom Navigation */}
       <div className="bottom-nav">
         <button
           className={activeTab === "home" ? "active" : ""}
-          onClick={() => { navigate("/"); setActiveTab("home"); }}
+          onClick={() => {
+            navigate("/");
+            setActiveTab("home");
+          }}
         >
           <AiOutlineHome />
           Home
@@ -231,7 +232,10 @@ const logoutUser = async () => {
 
         <button
           className={activeTab === "saved" ? "active" : ""}
-          onClick={() => { navigate("/saved"); setActiveTab("saved"); }}
+          onClick={() => {
+            navigate("/saved");
+            setActiveTab("saved");
+          }}
         >
           {savedVideos ? <BsBookmarkFill /> : <BsBookmark />}
           Saved
@@ -240,7 +244,10 @@ const logoutUser = async () => {
         {user?.isFoodPartner && (
           <button
             className={activeTab === "create" ? "active" : ""}
-            onClick={() => { navigate("/create-food"); setActiveTab("create"); }}
+            onClick={() => {
+              navigate("/create-food");
+              setActiveTab("create");
+            }}
           >
             ➕ Create Food
           </button>
