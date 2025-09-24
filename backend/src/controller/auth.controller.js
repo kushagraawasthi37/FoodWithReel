@@ -35,17 +35,19 @@ async function registerUser(req, res) {
     }
   );
 
-  const isProduction = true;
+  // const isProduction = true;
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: "none",
-    maxAge: 24 * 60 * 60 * 1000,
-  });
+  // res.cookie("token", token, {
+  //   httpOnly: true,
+  //   secure: isProduction,
+  //   sameSite: "none",
+  //   maxAge: 24 * 60 * 60 * 1000,
+  // });
 
   res.status(201).json({
     message: "User created successfully",
+    token, // send token in response body
+
     user: {
       _id: user._id,
       email: user.email,
@@ -80,27 +82,29 @@ async function loginUser(req, res) {
     expiresIn: process.env.JWT_EXPIRY_TIME,
   });
 
-  const isProduction = true;
+  // const isProduction = true;
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: "none",
-    maxAge: 24 * 60 * 60 * 1000,
-  });
+  // res.cookie("token", token, {
+  //   httpOnly: true,
+  //   secure: isProduction,
+  //   sameSite: "none",
+  //   maxAge: 24 * 60 * 60 * 1000,
+  // });
 
   return res.status(200).json({
     message: "User login successfully",
+    token, // send token in response body
+
     user: { _id: user._id, email: user.email, fullName: user.fullName },
   });
 }
 
 async function logoutUser(req, res) {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
-  });
+  // res.clearCookie("token", {
+  //   httpOnly: true,
+  //   secure: process.env.NODE_ENV === "production",
+  //   sameSite: "none",
+  // });
   res.status(200).json({
     message: "user Logged out successfully",
   });
@@ -154,17 +158,19 @@ async function registerFoodPartner(req, res) {
     }
   );
 
-  const isProduction = true;
+  // const isProduction = true;
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: "none",
-    maxAge: 24 * 60 * 60 * 1000,
-  });
+  // res.cookie("token", token, {
+  //   httpOnly: true,
+  //   secure: isProduction,
+  //   sameSite: "none",
+  //   maxAge: 24 * 60 * 60 * 1000,
+  // });
 
   res.status(201).json({
     message: "User created successfully",
+    token, // send token in response body
+
     foodpartner: {
       _id: foodpartner._id,
       email: foodpartner.email,
@@ -205,19 +211,21 @@ async function loginFoodPartner(req, res) {
       expiresIn: process.env.JWT_EXPIRY_TIME,
     });
 
-    // Set cookie
-    const isProduction =true;
+    // // Set cookie
+    // const isProduction = true;
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: "none",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
+    // res.cookie("token", token, {
+    //   httpOnly: true,
+    //   secure: isProduction,
+    //   sameSite: "none",
+    //   maxAge: 24 * 60 * 60 * 1000,
+    // });
 
     // Return user data and mark as food-partner
     res.status(200).json({
       message: "Partner login successfully",
+        token,  // send token in response body
+
       user: {
         _id: foodpartner._id,
         fullName: foodpartner.fullName,
@@ -233,11 +241,11 @@ async function loginFoodPartner(req, res) {
 }
 
 async function logoutFoodPartner(req, res) {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  });
+  // res.clearCookie("token", {
+  //   httpOnly: true,
+  //   secure: true,
+  //   sameSite: "none",
+  // });
 
   res.status(200).json({
     message: "user Logged out successfully",

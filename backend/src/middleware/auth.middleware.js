@@ -3,13 +3,22 @@ const userModel = require("../models/user.models");
 const jwt = require("jsonwebtoken");
 
 async function authFoodpartnerMiddleware(req, res, next) {
-  const token = req.cookies.token;
-  console.log("Cookies:", req.cookies); // see if token exists
+  // Check token in cookie or Authorization header
+  const authHeader = req.header("Authorization");
+  const token =
+    req.cookies?.token ||
+    (authHeader && authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1].trim()
+      : null);
+
+  console.log("Token received:", token);
+
   if (!token) {
     return res.status(401).json({
-      message: "please login first",
+      message: "Please login first",
     });
   }
+
   let decodedToken;
   try {
     decodedToken = jwt.verify(token, process.env.JWT_SECRET);
@@ -17,19 +26,16 @@ async function authFoodpartnerMiddleware(req, res, next) {
     return res.status(401).json({ message: "Invalid Token" });
   }
 
-  const foodPartner = await foodPartnerModel.findById({
-    _id: decodedToken?._id,
-  });
+  const foodPartner = await foodPartnerModel.findById(decodedToken._id);
 
   if (!foodPartner) {
-    return res
-      .status(403)
-      .json({ message: "unauthorised request please login first" });
+    return res.status(403).json({ message: "Unauthorized request please login first" });
   }
 
   req.foodPartner = foodPartner;
   next();
 }
+
 
 async function authUserMiddleware(req, res, next) {
   try {
